@@ -155,10 +155,13 @@
     <ClCompile Include="Shaders\LoadShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="forShading.h" />
     <ClInclude Include="Object_Definitions.h" />
     <ClInclude Include="Shaders\LoadShaders.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\Phong.frag" />
+    <None Include="Shaders\Phong.vert" />
     <None Include="Shaders\simple.frag" />
     <None Include="Shaders\simple.vert" />
   </ItemGroup>
