@@ -24,6 +24,7 @@ GLint loc_ModelViewProjectionMatrix_PS, loc_ModelViewMatrix_PS, loc_ModelViewMat
 // include glm/*.hpp only if necessary
 //#include <glm/glm.hpp> 
 #include <glm/gtc/matrix_transform.hpp> //translate, rotate, scale, lookAt, perspective, etc.
+#include <glm/gtc/matrix_inverse.hpp> // inverseTranspose, etc.
 
 glm::mat4 ModelMatrix_CAR_BODY, ModelMatrix_CAR_WHEEL, ModelMatrix_CAR_NUT, ModelMatrix_CAR_DRIVER;
 //glm::mat4 ModelMatrix_CAR_BODY_to_DRIVER; // computed only once in initialize_camera()
@@ -87,6 +88,7 @@ glm::mat4 ModelViewMatrix[NUMBER_OF_CAMERAS];
 glm::mat4 ProjectionMatrix[NUMBER_OF_CAMERAS];
 glm::mat4 ViewProjectionMatrix[NUMBER_OF_CAMERAS];
 glm::mat4 ModelViewProjectionMatrix; // Mp * Mv * Mm
+glm::mat3 ModelViewMatrixInvTrans;
 
 #define TO_RADIAN 0.01745329252f  
 #define TO_DEGREE 57.295779513f
@@ -210,6 +212,7 @@ void display_camera(int camera_id) {
 	draw_static_object(&(static_objects[OBJ_BUS]), 0, camera_id);
 	draw_static_object(&(static_objects[OBJ_BIKE]), 0, camera_id);
 
+	set_material_tiger();
 	draw_animated_tiger(camera_id);
 
 	glUseProgram(0);
@@ -329,8 +332,21 @@ void motion(int x, int y) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-	static int flag_cull_face = 0, polygon_fill_on = 0, depth_test_on = 0;
+	static int flag_cull_face = 0, polygon_fill_on = 1, depth_test_on = 0;
 	int target_cam = (ViewMode == EXTERIOR_MODE ? MAIN_CAM : CCTV_DYN);
+
+
+	if ((key >= '1') && (key <= '1' + NUMBER_OF_LIGHT_SUPPORTED - 1)) {
+		int light_ID = (int)(key - '1');
+
+		glUseProgram(h_ShaderProgram_PS);
+		light[light_ID].light_on = 1 - light[light_ID].light_on;
+		glUniform1i(loc_light[light_ID].light_on, light[light_ID].light_on);
+		glUseProgram(0);
+
+		glutPostRedisplay();
+		return;
+	}
 
 	switch (key) {
 	case 27: // ESC key
@@ -682,12 +698,12 @@ void initialize_lights_and_material(void) { // follow OpenGL conventions for ini
 
 	glUseProgram(h_ShaderProgram_PS);
 
-	glUniform4f(loc_global_ambient_color, 0.5f, 0.5f, 0.5f, 1.0f);
+	glUniform4f(loc_global_ambient_color, 0.2f, 0.2f, 0.2f, 1.0f);
 	for (i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++) {
 		glUniform1i(loc_light[i].light_on, 0); // turn off all lights initially
 		glUniform4f(loc_light[i].position, 0.0f, 0.0f, 1.0f, 0.0f);
 		glUniform4f(loc_light[i].ambient_color, 0.0f, 0.0f, 0.0f, 1.0f);
-		if (i == 0) {
+		if (i == 10) {
 			glUniform4f(loc_light[i].diffuse_color, 1.0f, 1.0f, 1.0f, 1.0f);
 			glUniform4f(loc_light[i].specular_color, 1.0f, 1.0f, 1.0f, 1.0f);
 		}
@@ -824,56 +840,59 @@ void initialize_camera(void) {
 }
 
 void initialize_OpenGL(void) {
-	glEnable(GL_DEPTH_TEST); // Default state
+	glDisable(GL_DEPTH_TEST); //glEnable(GL_DEPTH_TEST); // Default state
+	glEnable(GL_MULTISAMPLE);
 	 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glClearColor(0.12f, 0.18f, 0.12f, 1.0f);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//glClearColor(0.12f, 0.18f, 0.12f, 1.0f);
 
 	initialize_camera();
 	initialize_lights_and_material();
 }
 
 void set_up_scene_lights(void) {
-	// point_light_EC: use light 0
+	// spot_light_WC: use light 0
 	light[0].light_on = 1;
-	light[0].position[0] = 120.0f; light[0].position[1] = 85.0f; 	// point light position in WC
-	light[0].position[2] = 100.0f; light[0].position[3] = 1.0f;
 
-	light[0].ambient_color[0] = 0.3f; light[0].ambient_color[1] = 0.3f;
-	light[0].ambient_color[2] = 0.3f; light[0].ambient_color[3] = 1.0f;
-
-	light[0].diffuse_color[0] = 0.7f; light[0].diffuse_color[1] = 0.7f;
-	light[0].diffuse_color[2] = 0.7f; light[0].diffuse_color[3] = 1.0f;
-
-	light[0].specular_color[0] = 0.9f; light[0].specular_color[1] = 0.9f;
-	light[0].specular_color[2] = 0.9f; light[0].specular_color[3] = 1.0f;
-
-	light[0].spot_direction[0] = 0.0f; light[0].spot_direction[1] = 0.0f; // spot light direction in WC
-	light[0].spot_direction[2] = -1.0f;
-	light[0].spot_cutoff_angle = 70.0f;
-	light[0].spot_exponent = 2.0f;
+	light[0].position[0] = 0.0f; light[0].position[1] = 0.0f; 	// spot light position in WC
+	light[0].position[2] = 10.0f; light[0].position[3] = 1.0f;
 
 	/*
-	// spot_light_WC: use light 1
-	light[1].light_on = 1;
-	light[1].position[0] = -200.0f; light[1].position[1] = 500.0f; // spot light position in WC
-	light[1].position[2] = -200.0f; light[1].position[3] = 1.0f;
-
-	light[1].ambient_color[0] = 0.2f; light[1].ambient_color[1] = 0.2f;
-	light[1].ambient_color[2] = 0.2f; light[1].ambient_color[3] = 1.0f;
-
-	light[1].diffuse_color[0] = 0.82f; light[1].diffuse_color[1] = 0.82f;
-	light[1].diffuse_color[2] = 0.82f; light[1].diffuse_color[3] = 1.0f;
-
-	light[1].specular_color[0] = 0.82f; light[1].specular_color[1] = 0.82f;
-	light[1].specular_color[2] = 0.82f; light[1].specular_color[3] = 1.0f;
-
-	light[1].spot_direction[0] = 0.0f; light[1].spot_direction[1] = -1.0f; // spot light direction in WC
-	light[1].spot_direction[2] = 0.0f;
-	light[1].spot_cutoff_angle = 20.0f;
-	light[1].spot_exponent = 27.0f;
+	light[0].position[0] = 120.0f; light[0].position[1] = 85.0f; 	// spot light position in WC
+	light[0].position[2] = 50.0f; light[0].position[3] = 1.0f;
 	*/
 
+	light[0].ambient_color[0] = 0.2f; 
+	light[0].ambient_color[1] = 0.2f;
+	light[0].ambient_color[2] = 0.2f; light[0].ambient_color[3] = 1.0f;
+
+	light[0].diffuse_color[0] = 0.82f; light[0].diffuse_color[1] = 0.82f;
+	light[0].diffuse_color[2] = 0.82f; light[0].diffuse_color[3] = 1.0f;
+
+	light[0].specular_color[0] = 0.82f; light[0].specular_color[1] = 0.82f;
+	light[0].specular_color[2] = 0.82f; light[0].specular_color[3] = 1.0f;
+
+	/*
+	light[0].spot_direction[0] = 0.0f;
+	light[0].spot_direction[1] = 0.0f; // spot light direction in WC
+	light[0].spot_direction[2] = -1.0f;
+	light[0].spot_cutoff_angle = 50.0f;
+	light[0].spot_exponent = 27.0f;
+	*/
+
+	glUseProgram(h_ShaderProgram_PS);
+	glUniform1i(loc_light[0].light_on, light[0].light_on);
+	glUniform4fv(loc_light[0].position, 1, light[0].position);
+	glUniform4fv(loc_light[0].ambient_color, 1, light[0].ambient_color);
+	glUniform4fv(loc_light[0].diffuse_color, 1, light[0].diffuse_color);
+	glUniform4fv(loc_light[0].specular_color, 1, light[0].specular_color);
+
+	glm::vec4 position_EC = ViewMatrix[MAIN_CAM] * glm::vec4(light[0].position[0], light[0].position[1],
+		light[0].position[2], light[0].position[3]);
+	glUniform4fv(loc_light[0].position, 1, &position_EC[0]);
+	
+	/*
 	glUseProgram(h_ShaderProgram_PS);
 	glUniform1i(loc_light[0].light_on, light[0].light_on);
 	glm::vec4 position_EC = ViewMatrix[MAIN_CAM] * glm::vec4(light[0].position[0], light[0].position[1],
@@ -883,29 +902,13 @@ void set_up_scene_lights(void) {
 	glUniform4fv(loc_light[0].diffuse_color, 1, light[0].diffuse_color);
 	glUniform4fv(loc_light[0].specular_color, 1, light[0].specular_color);
 
+	
 	glm::vec3 direction_EC = glm::mat3(ViewMatrix[MAIN_CAM]) * glm::vec3(light[0].spot_direction[0], light[0].spot_direction[1],
 		light[0].spot_direction[2]);
+	
 	glUniform3fv(loc_light[0].spot_direction, 1, &direction_EC[0]);
 	glUniform1f(loc_light[0].spot_cutoff_angle, light[0].spot_cutoff_angle);
 	glUniform1f(loc_light[0].spot_exponent, light[0].spot_exponent);
-
-	/*
-	glUniform1i(loc_light[1].light_on, light[1].light_on);
-	// need to supply position in EC for shading
-	glm::vec4 position_EC = ViewMatrix * glm::vec4(light[1].position[0], light[1].position[1],
-		light[1].position[2], light[1].position[3]);
-	glUniform4fv(loc_light[1].position, 1, &position_EC[0]);
-	glUniform4fv(loc_light[1].ambient_color, 1, light[1].ambient_color);
-	glUniform4fv(loc_light[1].diffuse_color, 1, light[1].diffuse_color);
-	glUniform4fv(loc_light[1].specular_color, 1, light[1].specular_color);
-	// need to supply direction in EC for shading in this example shader
-	// note that the viewing transform is a rigid body transform
-	// thus transpose(inverse(mat3(ViewMatrix)) = mat3(ViewMatrix)
-	glm::vec3 direction_EC = glm::mat3(ViewMatrix) * glm::vec3(light[1].spot_direction[0], light[1].spot_direction[1],
-		light[1].spot_direction[2]);
-	glUniform3fv(loc_light[1].spot_direction, 1, &direction_EC[0]);
-	glUniform1f(loc_light[1].spot_cutoff_angle, light[1].spot_cutoff_angle);
-	glUniform1f(loc_light[1].spot_exponent, light[1].spot_exponent);
 	*/
 
 	glUseProgram(0);
@@ -916,14 +919,14 @@ void prepare_scene(void) {
 	char car_wheel[] = "Data/car_wheel_triangles_v.txt";
 	char car_nut[] = "Data/car_nut_triangles_v.txt";
 
-	define_axes();
-	define_static_objects();
+	//define_axes();
+	//define_static_objects();
 	define_animated_tiger();
-	define_camera();
-	define_line();
-	prepare_hier_obj(HIER_OBJ_CAR_BODY, car_body, HIER_OBJ_TYPE_V);
-	prepare_hier_obj(HIER_OBJ_CAR_WHEEL, car_wheel, HIER_OBJ_TYPE_V);
-	prepare_hier_obj(HIER_OBJ_CAR_NUT, car_nut, HIER_OBJ_TYPE_V);
+	//define_camera();
+	//define_line();
+	//prepare_hier_obj(HIER_OBJ_CAR_BODY, car_body, HIER_OBJ_TYPE_V);
+	//prepare_hier_obj(HIER_OBJ_CAR_WHEEL, car_wheel, HIER_OBJ_TYPE_V);
+	//prepare_hier_obj(HIER_OBJ_CAR_NUT, car_nut, HIER_OBJ_TYPE_V);
 
 	set_up_scene_lights();
 }
@@ -977,7 +980,7 @@ void main(int argc, char *argv[]) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(1200, 800);
-	glutInitContextVersion(4, 0);
+	glutInitContextVersion(4, 1);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow(program_name);
 

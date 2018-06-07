@@ -99,6 +99,8 @@ void prepare_geom_of_static_object(Object *obj_ptr) {
 	glBindBuffer(GL_ARRAY_BUFFER, obj_ptr->VBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(0));
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -116,8 +118,8 @@ void define_static_objects(void) {
 
     static_objects[OBJ_BUILDING].ModelMatrix[0] = glm::mat4(1.0f);
 	
-	static_objects[OBJ_BUILDING].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	static_objects[OBJ_BUILDING].material[0].ambient = glm::vec4(0.135f, 0.2225f, 0.1575f, 1.0f);
+	static_objects[OBJ_BUILDING].material[0].emission = glm::vec4(0.0f, 1.0f, 127.0f / 255.0f, 1.0f);
+	static_objects[OBJ_BUILDING].material[0].ambient = glm::vec4(0.135f, 0.2225f, 0.1575f, 1.0f); //glm::vec4(0.135f, 0.2225f, 0.1575f, 1.0f);
 	static_objects[OBJ_BUILDING].material[0].diffuse = glm::vec4(0.54f, 0.89f, 0.63f, 1.0f);
 	static_objects[OBJ_BUILDING].material[0].specular = glm::vec4(0.316228f, 0.316228f, 0.316228f, 1.0f);
 	static_objects[OBJ_BUILDING].material[0].exponent = 128.0f*0.1f;
@@ -351,7 +353,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_IRONMAN].ModelMatrix[0] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[0], 90.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[0] = glm::scale(static_objects[OBJ_IRONMAN].ModelMatrix[0], glm::vec3(8.0f, 8.0f, 8.0f));
 
-	static_objects[OBJ_IRONMAN].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[0].emission = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[0].diffuse = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
@@ -363,7 +365,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[1], 90.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::scale(static_objects[OBJ_IRONMAN].ModelMatrix[1], glm::vec3(8.0f, 8.0f, 8.0f));
 
-	static_objects[OBJ_IRONMAN].material[1].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[1].emission = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[1].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[1].diffuse = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[1].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
@@ -383,7 +385,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_TANK].ModelMatrix[0] = glm::scale(static_objects[OBJ_TANK].ModelMatrix[0], glm::vec3(4.0f, 4.0f, 4.0f));
 	static_objects[OBJ_TANK].ModelMatrix[0] = glm::translate(static_objects[OBJ_TANK].ModelMatrix[0], glm::vec3(0.0f, -15.0f, 0.0f));
 
-	static_objects[OBJ_TANK].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static_objects[OBJ_TANK].material[0].emission = glm::vec4(178 / 255.0f, 94 / 255.0f, 218 / 255.0f, 0.63f / 255.0f);
 	static_objects[OBJ_TANK].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
 	static_objects[OBJ_TANK].material[0].diffuse = glm::vec4(178 / 255.0f, 94 / 255.0f, 218 / 255.0f, 0.63f / 255.0f);
 	static_objects[OBJ_TANK].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
@@ -394,7 +396,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_TANK].ModelMatrix[1] = glm::scale(static_objects[OBJ_TANK].ModelMatrix[1], glm::vec3(4.0f, 4.0f, 4.0f));
 	static_objects[OBJ_TANK].ModelMatrix[1] = glm::translate(static_objects[OBJ_TANK].ModelMatrix[1], glm::vec3(0.0f, -15.0f, 0.0f));
 
-	static_objects[OBJ_TANK].material[1].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static_objects[OBJ_TANK].material[1].emission = glm::vec4(94 / 255.0f, 218 / 255.0f, 184 / 255.0f, 0.63 / 255.0f);
 	static_objects[OBJ_TANK].material[1].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
 	static_objects[OBJ_TANK].material[1].diffuse = glm::vec4(94 / 255.0f, 218 / 255.0f, 184 / 255.0f, 0.63 / 255.0f);
 	static_objects[OBJ_TANK].material[1].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
@@ -414,7 +416,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::rotate(static_objects[OBJ_GODZILLA].ModelMatrix[0], 180.0f * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::rotate(static_objects[OBJ_GODZILLA].ModelMatrix[0], 90.0f * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
-	static_objects[OBJ_GODZILLA].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static_objects[OBJ_GODZILLA].material[0].emission = glm::vec4(218 / 255.0f, 199 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
 	static_objects[OBJ_GODZILLA].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
 	static_objects[OBJ_GODZILLA].material[0].diffuse = glm::vec4(218 / 255.0f, 199 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
 	static_objects[OBJ_GODZILLA].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
@@ -434,7 +436,7 @@ void define_static_objects(void) {
 
 	static_objects[OBJ_BUS].n_geom_instances = 1;
 
-	static_objects[OBJ_BUS].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static_objects[OBJ_BUS].material[0].emission = glm::vec4(218 / 255.0f, 94 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
 	static_objects[OBJ_BUS].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
 	static_objects[OBJ_BUS].material[0].diffuse = glm::vec4(218 / 255.0f, 94 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
 	static_objects[OBJ_BUS].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
@@ -454,7 +456,7 @@ void define_static_objects(void) {
 
 	static_objects[OBJ_BIKE].n_geom_instances = 1;
 
-	static_objects[OBJ_BIKE].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	static_objects[OBJ_BIKE].material[0].emission = glm::vec4(156 / 255.0f, 218 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
 	static_objects[OBJ_BIKE].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
 	static_objects[OBJ_BIKE].material[0].diffuse = glm::vec4(156 / 255.0f, 218 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
 	static_objects[OBJ_BIKE].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
@@ -463,16 +465,55 @@ void define_static_objects(void) {
 	n_static_objects = 13;
 }
 
+void set_material_static_object(Object obj, int instance) {
+	Material_Parameters material_static_object;
+
+	material_static_object.ambient_color[0] = obj.material[instance].ambient.r;
+	material_static_object.ambient_color[1] = obj.material[instance].ambient.g;
+	material_static_object.ambient_color[2] = obj.material[instance].ambient.b;
+	material_static_object.ambient_color[3] = obj.material[instance].ambient.a;
+
+	material_static_object.diffuse_color[0] = obj.material[instance].diffuse.r;
+	material_static_object.diffuse_color[1] = obj.material[instance].diffuse.g;
+	material_static_object.diffuse_color[2] = obj.material[instance].diffuse.b;
+	material_static_object.diffuse_color[3] = obj.material[instance].diffuse.a;
+
+	material_static_object.specular_color[0] = obj.material[instance].specular.r;
+	material_static_object.specular_color[1] = obj.material[instance].specular.g;
+	material_static_object.specular_color[2] = obj.material[instance].specular.b;
+	material_static_object.specular_color[3] = obj.material[instance].specular.a;
+
+	material_static_object.specular_exponent = obj.material[instance].exponent;
+
+	material_static_object.emissive_color[0] = obj.material[instance].emission.r;
+	material_static_object.emissive_color[1] = obj.material[instance].emission.g;
+	material_static_object.emissive_color[2] = obj.material[instance].emission.b;
+	material_static_object.emissive_color[3] = obj.material[instance].emission.a;
+
+	// assume ShaderProgram_PS is used
+	glUniform4fv(loc_material.ambient_color, 1, material_static_object.ambient_color);
+	glUniform4fv(loc_material.diffuse_color, 1, material_static_object.diffuse_color);
+	glUniform4fv(loc_material.specular_color, 1, material_static_object.specular_color);
+	glUniform1f(loc_material.specular_exponent, material_static_object.specular_exponent);
+	glUniform4fv(loc_material.emissive_color, 1, material_static_object.emissive_color);
+}
+
 void draw_static_object(Object *obj_ptr, int instance_ID, int camera_ID) {
 	glFrontFace(obj_ptr->front_face_mode);
 
+	set_material_static_object(*obj_ptr, instance_ID);
+
 	ModelViewMatrix[camera_ID] = ViewMatrix[camera_ID] * obj_ptr->ModelMatrix[instance_ID];
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_ID] * ModelViewMatrix[camera_ID];
+	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_ID]));
+
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_ID][0][0]);
+	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 
-	glUniform3f(loc_primitive_color, obj_ptr->material[instance_ID].diffuse.r,
-		obj_ptr->material[instance_ID].diffuse.g, obj_ptr->material[instance_ID].diffuse.b);
-
+	//glUniform3f(loc_primitive_color, obj_ptr->material[instance_ID].diffuse.r,
+		//obj_ptr->material[instance_ID].diffuse.g, obj_ptr->material[instance_ID].diffuse.b);
+	glFrontFace(GL_CCW);
 	glBindVertexArray(obj_ptr->VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3 * obj_ptr->n_triangles);
 	glBindVertexArray(0);
@@ -674,6 +715,9 @@ void free_hier_obj(int hier_obj_ID) {
 
 #define N_TIGER_FRAMES 12
 Object tiger[N_TIGER_FRAMES];
+
+Material_Parameters material_tiger;
+
 struct {
 	int cur_frame = 0;
 	float rotation_angle = 0.0f;
@@ -763,24 +807,44 @@ void define_animated_tiger(void) {
 
 		tiger[i].ModelMatrix[0] = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
 
-		tiger[i].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-		tiger[i].material[0].ambient = glm::vec4(0.329412f, 0.223529f, 0.027451f, 1.0f);
-		tiger[i].material[0].diffuse = glm::vec4(0.780392f, 0.568627f, 0.113725f, 1.0f);
-		tiger[i].material[0].specular = glm::vec4(0.992157f, 0.941176f, 0.807843f, 1.0f);
-		tiger[i].material[0].exponent = 128.0f*0.21794872f;
+		tiger[i].material[0].emission = glm::vec4(0.1f, 0.1f, 0.0f, 1.0f);
+		tiger[i].material[0].ambient = glm::vec4(0.24725f, 0.1995f, 0.0745f, 1.0f);
+		tiger[i].material[0].diffuse = glm::vec4(0.75164f, 0.60648f, 0.22648f, 1.0f);
+		tiger[i].material[0].specular = glm::vec4(0.628281f, 0.555802f, 0.366065f, 1.0f);
+		tiger[i].material[0].exponent = 51.2f;
 	}
+
+	material_tiger.ambient_color[0] = 0.24725f;
+	material_tiger.ambient_color[1] = 0.1995f;
+	material_tiger.ambient_color[2] = 0.0745f;
+	material_tiger.ambient_color[3] = 1.0f;
+
+	material_tiger.diffuse_color[0] = 0.75164f;
+	material_tiger.diffuse_color[1] = 0.60648f;
+	material_tiger.diffuse_color[2] = 0.22648f;
+	material_tiger.diffuse_color[3] = 1.0f;
+
+	material_tiger.specular_color[0] = 0.628281f;
+	material_tiger.specular_color[1] = 0.555802f;
+	material_tiger.specular_color[2] = 0.366065f;
+	material_tiger.specular_color[3] = 1.0f;
+
+	material_tiger.specular_exponent = 51.2f;
+
+	material_tiger.emissive_color[0] = 0.1f;
+	material_tiger.emissive_color[1] = 0.1f;
+	material_tiger.emissive_color[2] = 0.0f;
+	material_tiger.emissive_color[3] = 1.0f;
 }
 
-/**************************************************************************************
 void set_material_tiger(void) {
 	// assume ShaderProgram_PS is used
-	glUniform4fv(loc_material.ambient_color, 1, glm::vec4(0.329412f, 0.223529f, 0.027451f, 1.0f));
+	glUniform4fv(loc_material.ambient_color, 1, material_tiger.ambient_color);
 	glUniform4fv(loc_material.diffuse_color, 1, material_tiger.diffuse_color);
 	glUniform4fv(loc_material.specular_color, 1, material_tiger.specular_color);
 	glUniform1f(loc_material.specular_exponent, material_tiger.specular_exponent);
 	glUniform4fv(loc_material.emissive_color, 1, material_tiger.emissive_color);
 }
-*/
 
 void draw_animated_tiger(int camera_id) {
 	glm::vec3 orgHeadTo = glm::vec3(0.0f, -1.0f, 0.0f);
@@ -813,20 +877,31 @@ void draw_animated_tiger(int camera_id) {
 			ModelViewMatrix[camera_id] = glm::rotate(ModelViewMatrix[camera_id], -acos((glm::dot(orgHeadTo, tiger_data.headTo) / (glm::length(orgHeadTo) * glm::length(tiger_data.headTo)))), glm::vec3(0.0f, 0.0f, 1.0f));
 		ModelViewMatrix[camera_id] *= tiger[tiger_data.cur_frame].ModelMatrix[0];
 	}
-
+	
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
+	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
+
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 
-	glUniform3f(loc_primitive_color, tiger[tiger_data.cur_frame].material[0].diffuse.r,
-		tiger[tiger_data.cur_frame].material[0].diffuse.g, tiger[tiger_data.cur_frame].material[0].diffuse.b);
 
+	//glUniform3f(loc_primitive_color, tiger[tiger_data.cur_frame].material[0].diffuse.r,
+		//tiger[tiger_data.cur_frame].material[0].diffuse.g, tiger[tiger_data.cur_frame].material[0].diffuse.b);
+
+	glFrontFace(GL_CW);
 	glBindVertexArray(tiger[tiger_data.cur_frame].VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3 * tiger[tiger_data.cur_frame].n_triangles);
 	glBindVertexArray(0);
 
+	/*
+	glUseProgram(h_ShaderProgram_simple);
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(20.0f, 20.0f, 20.0f));
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_simple, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glLineWidth(2.0f);
 	draw_axes(camera_id);
+	glLineWidth(1.0f);
+	*/
 }
 
 GLuint points_VBO, points_VAO;
