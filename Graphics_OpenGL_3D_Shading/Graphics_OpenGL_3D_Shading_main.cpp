@@ -115,6 +115,12 @@ void set_ViewMatrix(int camera_id) {
 void display_camera(int camera_id) {
 	glViewport(viewport[camera_id].x, viewport[camera_id].y, viewport[camera_id].w, viewport[camera_id].h);
 
+	/*
+	glm::vec4 position_EC = ViewMatrix[camera_id] * glm::vec4(light[0].position[0], light[0].position[1],
+		light[0].position[2], light[0].position[3]);
+	glUniform4fv(loc_light[0].position, 1, &position_EC[0]);
+	*/
+
 	glUseProgram(h_ShaderProgram_PS);
 	draw_car(camera_id);
 
@@ -332,7 +338,7 @@ void motion(int x, int y) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-	static int flag_cull_face = 0, polygon_fill_on = 1, depth_test_on = 0;
+	static int flag_cull_face = 1, polygon_fill_on = 1, depth_test_on = 0;
 	int target_cam = (ViewMode == EXTERIOR_MODE ? MAIN_CAM : CCTV_DYN);
 
 
@@ -842,6 +848,9 @@ void initialize_camera(void) {
 void initialize_OpenGL(void) {
 	glDisable(GL_DEPTH_TEST); //glEnable(GL_DEPTH_TEST); // Default state
 	glEnable(GL_MULTISAMPLE);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -855,18 +864,43 @@ void set_up_scene_lights(void) {
 	// spot_light_WC: use light 0
 	light[0].light_on = 1;
 
-	light[0].position[0] = 120.0f; light[0].position[1] = 85.0f; 	// spot light position in WC
-	light[0].position[2] = 100.0f; light[0].position[3] = 1.0f;
+	light[0].position[0] = 0.0f;
+	light[0].position[1] = 0.0f;
+	light[0].position[2] = 10.0f;
+	light[0].position[3] = 1.0f;
 
+	/*
+	light[0].position[0] = 120.0f; light[0].position[1] = 0.0f; 	// spot light position in WC
+	light[0].position[2] = 25.0f; light[0].position[3] = 1.0f;
+
+	/*
 	light[0].ambient_color[0] = 0.2f; 
 	light[0].ambient_color[1] = 0.2f;
 	light[0].ambient_color[2] = 0.2f; light[0].ambient_color[3] = 1.0f;
+	*/
 
-	light[0].diffuse_color[0] = 0.82f; light[0].diffuse_color[1] = 0.82f;
-	light[0].diffuse_color[2] = 0.82f; light[0].diffuse_color[3] = 1.0f;
+	light[0].ambient_color[0] = 1.0f;
+	light[0].ambient_color[1] = 1.0f;
+	light[0].ambient_color[2] = 1.0f;
+	light[0].ambient_color[3] = 1.0f;
 
+	light[0].diffuse_color[0] = 1.0f;
+	light[0].diffuse_color[1] = 1.0f;
+	light[0].diffuse_color[2] = 1.0f;
+	light[0].diffuse_color[3] = 1.0f;
+
+	light[0].specular_color[0] = 1.0f;
+	light[0].specular_color[1] = 1.0f;
+	light[0].specular_color[2] = 1.0f;
+	light[0].specular_color[3] = 1.0f;
+
+	//light[0].diffuse_color[0] = 0.82f; light[0].diffuse_color[1] = 0.82f;
+	//light[0].diffuse_color[2] = 0.82f; light[0].diffuse_color[3] = 1.0f;
+
+	/*
 	light[0].specular_color[0] = 0.82f; light[0].specular_color[1] = 0.82f;
 	light[0].specular_color[2] = 0.82f; light[0].specular_color[3] = 1.0f;
+	*/
 
 	/*
 	light[0].spot_direction[0] = 0.0f;
@@ -883,6 +917,7 @@ void set_up_scene_lights(void) {
 	glUniform4fv(loc_light[0].diffuse_color, 1, light[0].diffuse_color);
 	glUniform4fv(loc_light[0].specular_color, 1, light[0].specular_color);
 
+	/*
 	glm::vec4 position_EC = ViewMatrix[MAIN_CAM] * glm::vec4(light[0].position[0], light[0].position[1],
 		light[0].position[2], light[0].position[3]);
 	glUniform4fv(loc_light[0].position, 1, &position_EC[0]);

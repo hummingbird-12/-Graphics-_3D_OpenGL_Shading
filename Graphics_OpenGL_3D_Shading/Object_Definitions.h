@@ -118,11 +118,11 @@ void define_static_objects(void) {
 
     static_objects[OBJ_BUILDING].ModelMatrix[0] = glm::mat4(1.0f);
 	
-	static_objects[OBJ_BUILDING].material[0].emission = glm::vec4(0.2f, 0.05f, 0.0f, 1.0f);
-	static_objects[OBJ_BUILDING].material[0].ambient = glm::vec4(0.2f, 0.0f / 225.0f, 0.0f / 255.0f, 1.0f);
+	static_objects[OBJ_BUILDING].material[0].emission = glm::vec4(0.1f, 0.05f, 0.0f, 1.0f);
+	static_objects[OBJ_BUILDING].material[0].ambient = glm::vec4(0.1f, 0.0f / 225.0f, 0.0f / 255.0f, 1.0f);
 	static_objects[OBJ_BUILDING].material[0].diffuse = glm::vec4(100.0f / 255.0f, 50.0f / 255.0f, 10.0f / 255.0f, 1.0f);
-	static_objects[OBJ_BUILDING].material[0].specular = glm::vec4(0.2f, 0.05f, 0.0f, 1.0f);
-	static_objects[OBJ_BUILDING].material[0].exponent = 2.5f;
+	static_objects[OBJ_BUILDING].material[0].specular = glm::vec4(0.1f, 0.05f, 0.0f, 1.0f);
+	static_objects[OBJ_BUILDING].material[0].exponent = 25.5f;
 
 	// table
 	strcpy(static_objects[OBJ_TABLE].filename, "Data/Table_vn.geom");
@@ -260,11 +260,11 @@ void define_static_objects(void) {
 
 	static_objects[OBJ_NEW_CHAIR].n_geom_instances = 1;
 
-	static_objects[OBJ_NEW_CHAIR].ModelMatrix[0] = glm::translate(glm::mat4(1.0f), glm::vec3(210.0f, 120.0f, 0.0f));
+	static_objects[OBJ_NEW_CHAIR].ModelMatrix[0] = glm::translate(glm::mat4(1.0f), glm::vec3(215.0f, 120.0f, 0.0f));
 	static_objects[OBJ_NEW_CHAIR].ModelMatrix[0] = glm::scale(static_objects[OBJ_NEW_CHAIR].ModelMatrix[0],
 		glm::vec3(0.8f, 0.8f, 0.8f));
 	static_objects[OBJ_NEW_CHAIR].ModelMatrix[0] = glm::rotate(static_objects[OBJ_NEW_CHAIR].ModelMatrix[0],
-		180.0f*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+		-90.0f*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 
 	static_objects[OBJ_NEW_CHAIR].material[0].emission = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	static_objects[OBJ_NEW_CHAIR].material[0].ambient = glm::vec4(0.05f, 0.05f, 0.0f, 1.0f);
@@ -353,22 +353,22 @@ void define_static_objects(void) {
 	static_objects[OBJ_IRONMAN].ModelMatrix[0] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[0], 90.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[0] = glm::scale(static_objects[OBJ_IRONMAN].ModelMatrix[0], glm::vec3(8.0f, 8.0f, 8.0f));
 
-	static_objects[OBJ_IRONMAN].material[0].emission = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
-	static_objects[OBJ_IRONMAN].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
-	static_objects[OBJ_IRONMAN].material[0].diffuse = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
-	static_objects[OBJ_IRONMAN].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
-	static_objects[OBJ_IRONMAN].material[0].exponent = 128.0f*0.1f;
+	static_objects[OBJ_IRONMAN].material[0].emission = glm::vec4(25.0f / 255.0f, 0.0f / 255.0f, 0.0f / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[0].ambient = glm::vec4(40.0f / 255.0f, 0.0f / 255.0f, 0.0f / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[0].diffuse = glm::vec4(170.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[0].specular = glm::vec4(190.0f / 255.0f, 50.0f / 255.0f, 40.0 / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[0].exponent = 50.0f;
 
-	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::translate(glm::mat4(1.0f), glm::vec3(120.0f, 115.0f, 0.0f));
+	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::translate(glm::mat4(1.0f), glm::vec3(130.0f, 115.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[1], -90.0f * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[1], 90.0f * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[1], 90.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::scale(static_objects[OBJ_IRONMAN].ModelMatrix[1], glm::vec3(8.0f, 8.0f, 8.0f));
 
-	static_objects[OBJ_IRONMAN].material[1].emission = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
-	static_objects[OBJ_IRONMAN].material[1].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
-	static_objects[OBJ_IRONMAN].material[1].diffuse = glm::vec4(238.0f / 255.0f, 50.0f / 255.0f, 4.0f / 255.0f, 1.0f);
-	static_objects[OBJ_IRONMAN].material[1].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[1].emission = glm::vec4(100.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[1].ambient = glm::vec4(0.3f, 0.15f, 0.1f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[1].diffuse = glm::vec4(207.0f / 255.0f, 164.0f / 255.0f, 119.0f / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[1].specular = glm::vec4(215.0f / 255.0f, 188.0f / 255.0f, 160.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[1].exponent = 128.0f*0.1f;
 
 	// TANK
@@ -1003,7 +1003,7 @@ void draw_animated_tiger(int camera_id) {
 	//glUniform3f(loc_primitive_color, tiger[tiger_data.cur_frame].material[0].diffuse.r,
 		//tiger[tiger_data.cur_frame].material[0].diffuse.g, tiger[tiger_data.cur_frame].material[0].diffuse.b);
 
-	glFrontFace(GL_CW);
+	//glFrontFace(GL_CW);
 	glBindVertexArray(tiger[tiger_data.cur_frame].VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3 * tiger[tiger_data.cur_frame].n_triangles);
 	glBindVertexArray(0);

@@ -46,5 +46,11 @@
     <None Include="Shaders\Phong.vert">
       <Filter>리소스 파일</Filter>
     </None>
+    <None Include="Shaders\Gouraud.frag">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="Shaders\Gouraud.vert">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>
