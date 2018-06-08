@@ -855,13 +855,8 @@ void set_up_scene_lights(void) {
 	// spot_light_WC: use light 0
 	light[0].light_on = 1;
 
-	light[0].position[0] = 0.0f; light[0].position[1] = 0.0f; 	// spot light position in WC
-	light[0].position[2] = 10.0f; light[0].position[3] = 1.0f;
-
-	/*
 	light[0].position[0] = 120.0f; light[0].position[1] = 85.0f; 	// spot light position in WC
-	light[0].position[2] = 50.0f; light[0].position[3] = 1.0f;
-	*/
+	light[0].position[2] = 100.0f; light[0].position[3] = 1.0f;
 
 	light[0].ambient_color[0] = 0.2f; 
 	light[0].ambient_color[1] = 0.2f;
@@ -878,7 +873,7 @@ void set_up_scene_lights(void) {
 	light[0].spot_direction[1] = 0.0f; // spot light direction in WC
 	light[0].spot_direction[2] = -1.0f;
 	light[0].spot_cutoff_angle = 50.0f;
-	light[0].spot_exponent = 27.0f;
+	light[0].spot_exponent = 7.0f;
 	*/
 
 	glUseProgram(h_ShaderProgram_PS);
@@ -891,6 +886,14 @@ void set_up_scene_lights(void) {
 	glm::vec4 position_EC = ViewMatrix[MAIN_CAM] * glm::vec4(light[0].position[0], light[0].position[1],
 		light[0].position[2], light[0].position[3]);
 	glUniform4fv(loc_light[0].position, 1, &position_EC[0]);
+
+	/*
+	glm::vec3 direction_EC = glm::mat3(ViewMatrix[MAIN_CAM]) * glm::vec3(light[0].spot_direction[0], light[0].spot_direction[1],
+		light[0].spot_direction[2]);
+
+	glUniform3fv(loc_light[0].spot_direction, 1, &direction_EC[0]);
+	glUniform1f(loc_light[0].spot_cutoff_angle, light[0].spot_cutoff_angle);
+	glUniform1f(loc_light[0].spot_exponent, light[0].spot_exponent);
 	
 	/*
 	glUseProgram(h_ShaderProgram_PS);
@@ -919,14 +922,14 @@ void prepare_scene(void) {
 	char car_wheel[] = "Data/car_wheel_triangles_v.txt";
 	char car_nut[] = "Data/car_nut_triangles_v.txt";
 
-	//define_axes();
-	//define_static_objects();
+	define_axes();
+	define_static_objects();
 	define_animated_tiger();
-	//define_camera();
-	//define_line();
-	//prepare_hier_obj(HIER_OBJ_CAR_BODY, car_body, HIER_OBJ_TYPE_V);
-	//prepare_hier_obj(HIER_OBJ_CAR_WHEEL, car_wheel, HIER_OBJ_TYPE_V);
-	//prepare_hier_obj(HIER_OBJ_CAR_NUT, car_nut, HIER_OBJ_TYPE_V);
+	define_camera();
+	define_line();
+	prepare_hier_obj(HIER_OBJ_CAR_BODY, car_body, HIER_OBJ_TYPE_V);
+	prepare_hier_obj(HIER_OBJ_CAR_WHEEL, car_wheel, HIER_OBJ_TYPE_V);
+	prepare_hier_obj(HIER_OBJ_CAR_NUT, car_nut, HIER_OBJ_TYPE_V);
 
 	set_up_scene_lights();
 }
