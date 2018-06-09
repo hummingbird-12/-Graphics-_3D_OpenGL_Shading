@@ -547,7 +547,6 @@ void define_axes(void) {
 
 #define WC_AXIS_LENGTH		60.0f
 void draw_axes(int camera_id) {
-	ModelViewMatrix[camera_id] = glm::scale(ViewMatrix[camera_id], glm::vec3(WC_AXIS_LENGTH, WC_AXIS_LENGTH, WC_AXIS_LENGTH));
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_simple, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 
@@ -1008,10 +1007,9 @@ void draw_animated_tiger(int camera_id) {
 	glDrawArrays(GL_TRIANGLES, 0, 3 * tiger[tiger_data.cur_frame].n_triangles);
 	glBindVertexArray(0);
 
-	
+	// Tiger Axes
 	glUseProgram(h_ShaderProgram_simple);
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(20.0f, 20.0f, 20.0f));
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_simple, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	ModelViewMatrix[camera_id] = glm::scale(ModelViewMatrix[camera_id], glm::vec3(20.0f, 20.0f, 20.0f));
 	glLineWidth(2.0f);
 	draw_axes(camera_id);
 	glLineWidth(1.0f);

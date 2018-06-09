@@ -127,8 +127,10 @@ void set_ViewMatrix(int camera_id) {
 void display_camera(int camera_id) {
 	glViewport(viewport[camera_id].x, viewport[camera_id].y, viewport[camera_id].w, viewport[camera_id].h);
 
+	// World Axes
 	glUseProgram(h_ShaderProgram_simple);
 	glLineWidth(2.0f);
+	ModelViewMatrix[camera_id] = glm::scale(ViewMatrix[camera_id], glm::vec3(WC_AXIS_LENGTH, WC_AXIS_LENGTH, WC_AXIS_LENGTH));
 	draw_axes(camera_id);
 	glLineWidth(1.0f);
 
