@@ -28,6 +28,7 @@ uniform bool screen_effect = false;
 uniform float screen_width = 0.125f;
 
 uniform bool u_blind_effect = false;
+uniform float u_blind_intensity = 90.0f;
 
 uniform bool u_cartoon_effect = false;
 uniform float u_cartoon_level = 3.0f;
@@ -74,7 +75,7 @@ vec4 lighting_equation(in vec3 P_EC, in vec3 N_EC) {
 				tmp_float = dot(-L_EC, spot_dir);
 				if (tmp_float >= cos(radians(spot_cutoff_angle))) {
 					if(u_blind_effect) {
-						tmp_float = pow(tmp_float, u_light[i].spot_exponent) * cos(90.0f * acos(tmp_float));
+						tmp_float = pow(tmp_float, u_light[i].spot_exponent) * cos(u_blind_intensity * acos(tmp_float));
 					}
 					else
 						tmp_float = pow(tmp_float, u_light[i].spot_exponent);

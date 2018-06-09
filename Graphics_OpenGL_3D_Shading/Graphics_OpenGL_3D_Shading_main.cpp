@@ -17,9 +17,10 @@ GLint loc_global_ambient_color;
 loc_light_Parameters loc_light[NUMBER_OF_LIGHT_SUPPORTED];
 loc_Material_Parameters loc_material;
 GLint loc_screen_effect, loc_screen_width;
-GLint loc_blind_effect, loc_cartoon_effect, loc_cartoon_level;
+GLint loc_blind_effect, loc_cartoon_effect;
+GLfloat loc_blind_intensity, loc_cartoon_level;
 int flag_draw_screen, flag_screen_effect, flag_blind_effect, flag_cartoon_effect;
-float screen_width, cartoon_level;
+float blind_intensity, screen_width, cartoon_level;
 
 bool lightOff[NUMBER_OF_LIGHT_SUPPORTED];
 
@@ -302,6 +303,7 @@ void switch_shader_to(int shader) {
 		loc_screen_width = glGetUniformLocation(*shader_program, "screen_width");
 
 		loc_blind_effect = glGetUniformLocation(*shader_program, "u_blind_effect");
+		loc_blind_intensity = glGetUniformLocation(*shader_program, "u_blind_intensity");
 
 		loc_cartoon_effect = glGetUniformLocation(*shader_program, "u_cartoon_effect");
 		loc_cartoon_level = glGetUniformLocation(*shader_program, "u_cartoon_level");
@@ -639,12 +641,32 @@ void keyboard(unsigned char key, int x, int y) {
 			glutPostRedisplay();
 		}
 		break;
+	case '<':
+		if (shader_selected == PHONG && flag_blind_effect) {
+			if (blind_intensity + 3.0f <= 180.0f)
+				blind_intensity += 3.0f;
+			glUseProgram(*shader_program);
+			glUniform1f(loc_blind_intensity, blind_intensity);
+			glUseProgram(0);
+			glutPostRedisplay();
+		}
+		break;
+	case '>':
+		if (shader_selected == PHONG && flag_blind_effect) {
+			if (blind_intensity - 3.0f >= 0.0f)
+				blind_intensity -= 3.0f;
+			glUseProgram(*shader_program);
+			glUniform1f(loc_blind_intensity, blind_intensity);
+			glUseProgram(0);
+			glutPostRedisplay();
+		}
+		break;
 	case 'v': // toggle screen effect
 	case 'V':
 		if (shader_selected == PHONG) {
 		}
 		break;
-	case 'g':
+	case 'g': // toggle shader program
 	case 'G':
 		switch_shader_to(1 - shader_selected);
 		fprintf(stdout, "^^^ Switched to %s Shading.\n", shader_selected ? "GOURAUD" : "PHONG");
@@ -853,6 +875,7 @@ void initialize_lights_and_material(void) { // follow OpenGL conventions for ini
 		glUniform1f(loc_screen_width, screen_width);
 
 		glUniform1i(loc_blind_effect, flag_blind_effect);
+		glUniform1f(loc_blind_intensity, blind_intensity);
 
 		glUniform1i(loc_cartoon_effect, flag_cartoon_effect);
 		glUniform1f(loc_cartoon_level, cartoon_level);
@@ -988,6 +1011,7 @@ void initialize_OpenGL(void) {
 	flag_draw_screen = flag_screen_effect = flag_blind_effect = flag_cartoon_effect = 0;
 	screen_width = 0.125f;
 	cartoon_level = 3.0f;
+	blind_intensity = 90.0f;
 
 	initialize_camera();
 }
