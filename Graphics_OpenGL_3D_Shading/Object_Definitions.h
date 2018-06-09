@@ -119,7 +119,7 @@ void define_static_objects(void) {
     static_objects[OBJ_BUILDING].ModelMatrix[0] = glm::mat4(1.0f);
 	
 	static_objects[OBJ_BUILDING].material[0].emission = glm::vec4(0.1f, 0.05f, 0.0f, 1.0f);
-	static_objects[OBJ_BUILDING].material[0].ambient = glm::vec4(0.1f, 0.0f / 225.0f, 0.0f / 255.0f, 1.0f);
+	static_objects[OBJ_BUILDING].material[0].ambient = glm::vec4(0.1f, 0.0f, 0.0f, 1.0f);
 	static_objects[OBJ_BUILDING].material[0].diffuse = glm::vec4(100.0f / 255.0f, 50.0f / 255.0f, 10.0f / 255.0f, 1.0f);
 	static_objects[OBJ_BUILDING].material[0].specular = glm::vec4(0.1f, 0.05f, 0.0f, 1.0f);
 	static_objects[OBJ_BUILDING].material[0].exponent = 25.5f;
@@ -490,7 +490,7 @@ void set_material_static_object(Object obj, int instance) {
 	material_static_object.emissive_color[2] = obj.material[instance].emission.b;
 	material_static_object.emissive_color[3] = obj.material[instance].emission.a;
 
-	// assume ShaderProgram_PS is used
+	// assume ShaderProgram_PS/GS is used
 	glUniform4fv(loc_material.ambient_color, 1, material_static_object.ambient_color);
 	glUniform4fv(loc_material.diffuse_color, 1, material_static_object.diffuse_color);
 	glUniform4fv(loc_material.specular_color, 1, material_static_object.specular_color);
@@ -507,9 +507,9 @@ void draw_static_object(Object *obj_ptr, int instance_ID, int camera_ID) {
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_ID] * ModelViewMatrix[camera_ID];
 	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_ID]));
 
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_ID][0][0]);
-	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_ID][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 
 	//glUniform3f(loc_primitive_color, obj_ptr->material[instance_ID].diffuse.r,
 		//obj_ptr->material[instance_ID].diffuse.g, obj_ptr->material[instance_ID].diffuse.b);
@@ -751,9 +751,9 @@ void draw_wheel_and_nut(int camera_id) {
 		ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 		ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
 
-		glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-		glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
-		glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+		glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+		glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 		
 		//glUniform3f(loc_primitive_color, 215 / 255.0f, 46 / 255.0f, 42 / 255.0f);
 		draw_hier_obj(HIER_OBJ_CAR_NUT); // draw i-th nut
@@ -766,9 +766,9 @@ void draw_car(int camera_id) {
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
 
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
-	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 	
 	//glUniform3f(loc_primitive_color, 134 / 255.0f, 211 / 255.0f, 39 / 255.0f);
 	draw_hier_obj(HIER_OBJ_CAR_BODY); // draw body
@@ -780,9 +780,9 @@ void draw_car(int camera_id) {
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
 
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
-	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 	draw_wheel_and_nut(camera_id);  // draw wheel 0, front left
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, 4.5f));
@@ -791,9 +791,9 @@ void draw_car(int camera_id) {
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
 
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
-	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 	draw_wheel_and_nut(camera_id);  // draw wheel 1, back left
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(-3.9f, -3.5f, -4.5f));
@@ -804,9 +804,9 @@ void draw_car(int camera_id) {
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
 
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
-	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 	draw_wheel_and_nut(camera_id);  // draw wheel 2, front right
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, -4.5f));
@@ -816,9 +816,9 @@ void draw_car(int camera_id) {
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
 
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
-	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 	draw_wheel_and_nut(camera_id);  // draw wheel 3, back right
 }
 
@@ -952,7 +952,7 @@ void define_animated_tiger(void) {
 }
 
 void set_material_tiger(void) {
-	// assume ShaderProgram_PS is used
+	// assume ShaderProgram_PS/GS is used
 	glUniform4fv(loc_material.ambient_color, 1, material_tiger.ambient_color);
 	glUniform4fv(loc_material.diffuse_color, 1, material_tiger.diffuse_color);
 	glUniform4fv(loc_material.specular_color, 1, material_tiger.specular_color);
@@ -995,9 +995,9 @@ void draw_animated_tiger(int camera_id) {
 	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
 	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
 
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix_PS, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glUniformMatrix4fv(loc_ModelViewMatrix_PS, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
-	glUniformMatrix3fv(loc_ModelViewMatrixInvTrans_PS, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
 
 
 	//glUniform3f(loc_primitive_color, tiger[tiger_data.cur_frame].material[0].diffuse.r,

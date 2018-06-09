@@ -7,19 +7,27 @@
 
 #include "Shaders/LoadShaders.h"
 #include "forShading.h"
-GLuint h_ShaderProgram_simple, h_ShaderProgram_PS; // handle to shader program
+GLuint h_ShaderProgram_simple, h_ShaderProgram_PS, h_ShaderProgram_GS; // handle to shader program
 GLint loc_ModelViewProjectionMatrix_simple, loc_primitive_color; // indices of uniform variables
 
-#define NUMBER_OF_LIGHT_SUPPORTED 1
-																 // lights in scene
+#define NUMBER_OF_LIGHT_SUPPORTED 1 // lights in scene
 Light_Parameters light[NUMBER_OF_LIGHT_SUPPORTED];
 
 GLint loc_global_ambient_color;
 loc_light_Parameters loc_light[NUMBER_OF_LIGHT_SUPPORTED];
 loc_Material_Parameters loc_material;
 
+#define PHONG	0
+#define GOURAUD 1
 // for Phone Shading shaders
 GLint loc_ModelViewProjectionMatrix_PS, loc_ModelViewMatrix_PS, loc_ModelViewMatrixInvTrans_PS;
+GLint loc_ModelViewProjectionMatrix_GS, loc_ModelViewMatrix_GS, loc_ModelViewMatrixInvTrans_GS;
+
+int shader_selected;
+GLuint *shader_program;
+GLint *loc_ModelViewProjectionMatrix;
+GLint *loc_ModelViewMatrix;
+GLint *loc_ModelViewMatrixInvTrans;
 
 // include glm/*.hpp only if necessary
 //#include <glm/glm.hpp> 
@@ -115,14 +123,12 @@ void set_ViewMatrix(int camera_id) {
 void display_camera(int camera_id) {
 	glViewport(viewport[camera_id].x, viewport[camera_id].y, viewport[camera_id].w, viewport[camera_id].h);
 
-	/*
+	/*/
 	glm::vec4 position_EC = ViewMatrix[camera_id] * glm::vec4(light[0].position[0], light[0].position[1],
 		light[0].position[2], light[0].position[3]);
 	glUniform4fv(loc_light[0].position, 1, &position_EC[0]);
 	*/
-
-	glUseProgram(h_ShaderProgram_PS);
-	draw_car(camera_id);
+	
 
 	glUseProgram(h_ShaderProgram_simple);
 	glLineWidth(2.0f);
@@ -186,7 +192,9 @@ void display_camera(int camera_id) {
 		draw_line(camera_id, nearBR.x, nearBR.y, nearBR.z, nearBL.x, nearBL.y, nearBL.z, 180, 0, 210);
 	}
 
-	glUseProgram(h_ShaderProgram_PS);
+	glUseProgram(*shader_program);
+
+	draw_car(camera_id);
 
 	draw_static_object(&(static_objects[OBJ_BUILDING]), 0, camera_id);
 
@@ -262,6 +270,65 @@ void camera_rotate(int camera_id, float angle, glm::vec3 axis) {
 	camera[camera_id].naxis = rotation * camera[camera_id].naxis;
 }
 
+void initialize_lights_and_material(void);
+void set_up_scene_lights(void);
+
+void switch_shader_to(int shader) {
+	char string[256];
+
+	if (shader == PHONG) {
+		shader_selected = PHONG;
+		shader_program = &h_ShaderProgram_PS;
+
+		loc_ModelViewProjectionMatrix = &loc_ModelViewProjectionMatrix_PS;
+		loc_ModelViewMatrix = &loc_ModelViewMatrix_PS;
+		loc_ModelViewMatrixInvTrans = &loc_ModelViewMatrixInvTrans_PS;
+	}
+	else { // GOURAUD SHADING
+		shader_selected = GOURAUD;
+		shader_program = &h_ShaderProgram_GS;
+
+		loc_ModelViewProjectionMatrix = &loc_ModelViewProjectionMatrix_GS;
+		loc_ModelViewMatrix = &loc_ModelViewMatrix_GS;
+		loc_ModelViewMatrixInvTrans = &loc_ModelViewMatrixInvTrans_GS;
+	}
+
+	glUseProgram(*shader_program);
+
+	loc_global_ambient_color = glGetUniformLocation(*shader_program, "u_global_ambient_color");
+	for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++) {
+		sprintf(string, "u_light[%d].light_on", i);
+		loc_light[i].light_on = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].position", i);
+		loc_light[i].position = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].ambient_color", i);
+		loc_light[i].ambient_color = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].diffuse_color", i);
+		loc_light[i].diffuse_color = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].specular_color", i);
+		loc_light[i].specular_color = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].spot_direction", i);
+		loc_light[i].spot_direction = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].spot_exponent", i);
+		loc_light[i].spot_exponent = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].spot_cutoff_angle", i);
+		loc_light[i].spot_cutoff_angle = glGetUniformLocation(*shader_program, string);
+		sprintf(string, "u_light[%d].light_attenuation_factors", i);
+		loc_light[i].light_attenuation_factors = glGetUniformLocation(*shader_program, string);
+	}
+
+	loc_material.ambient_color = glGetUniformLocation(*shader_program, "u_material.ambient_color");
+	loc_material.diffuse_color = glGetUniformLocation(*shader_program, "u_material.diffuse_color");
+	loc_material.specular_color = glGetUniformLocation(*shader_program, "u_material.specular_color");
+	loc_material.emissive_color = glGetUniformLocation(*shader_program, "u_material.emissive_color");
+	loc_material.specular_exponent = glGetUniformLocation(*shader_program, "u_material.specular_exponent");
+
+	initialize_lights_and_material();
+	set_up_scene_lights();
+
+	glUseProgram(0);
+}
+
 #define SCROLL_UP 3
 #define SCROLL_DOWN 4
 void mouse(int button, int state, int x, int y) {
@@ -283,6 +350,21 @@ void mouse(int button, int state, int x, int y) {
 		break;
 	case GLUT_RIGHT_BUTTON: // right click
 		if (state == GLUT_DOWN) { // button pressed
+			// SHIFT pressed -> to GOURAUD SHADING
+			if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
+				if (shader_selected == PHONG) {
+					switch_shader_to(GOURAUD);
+					fprintf(stdout, "^^^ Switched to Gouraud Shading.\n");
+					glutPostRedisplay();
+				}
+			}
+			// SHIFT released -> to PHONG SHADING
+			else if (shader_selected == GOURAUD) {
+				switch_shader_to(PHONG);
+				fprintf(stdout, "^^^ Switched to Phong Shading.\n");
+				glutPostRedisplay();
+			}
+
 			CC.right_button = GLUT_DOWN;
 			CC.prevX = x;
 			CC.prevY = y;
@@ -290,6 +372,13 @@ void mouse(int button, int state, int x, int y) {
 			camera[target_cam].move_status = 1;
 		}
 		else if (state == GLUT_UP) { // button released
+			// RIGHT CLICK released -> to PHONG SHADING
+			if (shader_selected == GOURAUD) {
+				switch_shader_to(PHONG);
+				fprintf(stdout, "^^^ Switched to Phong Shading.\n");
+				glutPostRedisplay();
+			}
+
 			CC.right_button = GLUT_UP;
 			camera[MAIN_CAM].move_status = camera[CCTV_DYN].move_status = 0;
 		}
@@ -341,11 +430,25 @@ void keyboard(unsigned char key, int x, int y) {
 	static int flag_cull_face = 1, polygon_fill_on = 1, depth_test_on = 0;
 	int target_cam = (ViewMode == EXTERIOR_MODE ? MAIN_CAM : CCTV_DYN);
 
+	if (glutGetModifiers() != GLUT_ACTIVE_SHIFT && shader_selected == GOURAUD) {
+		switch_shader_to(PHONG);
+		fprintf(stdout, "^^^ Switched to Phong Shading.\n");
+		glutPostRedisplay();
+	}
+
+	if (key == '5') {
+		switch_shader_to(1 - shader_selected);
+		fprintf(stdout, "^^^ Switched to %s Shading.\n", shader_selected ? "GOURAUD" : "PHONG");
+		glutPostRedisplay();
+		return;
+	}
 
 	if ((key >= '1') && (key <= '1' + NUMBER_OF_LIGHT_SUPPORTED - 1)) {
 		int light_ID = (int)(key - '1');
 
-		glUseProgram(h_ShaderProgram_PS);
+		fprintf(stdout, "^^^ Turned %s light %d.\n", light[light_ID].light_on ? "off" : "on", light_ID);
+
+		glUseProgram(*shader_program);
 		light[light_ID].light_on = 1 - light[light_ID].light_on;
 		glUniform1i(loc_light[light_ID].light_on, light[light_ID].light_on);
 		glUseProgram(0);
@@ -660,6 +763,11 @@ void prepare_shader_program(void) {
 		{ GL_FRAGMENT_SHADER, "Shaders/Phong.frag" },
 		{ GL_NONE, NULL }
 	};
+	ShaderInfo shader_info_GS[3] = {
+		{ GL_VERTEX_SHADER, "Shaders/Gouraud.vert" },
+		{ GL_FRAGMENT_SHADER, "Shaders/Gouraud.frag" },
+		{ GL_NONE, NULL }
+	};
 
 	h_ShaderProgram_simple = LoadShaders(shader_info_simple);
 	loc_primitive_color = glGetUniformLocation(h_ShaderProgram_simple, "u_primitive_color");
@@ -670,6 +778,12 @@ void prepare_shader_program(void) {
 	loc_ModelViewMatrix_PS = glGetUniformLocation(h_ShaderProgram_PS, "u_ModelViewMatrix");
 	loc_ModelViewMatrixInvTrans_PS = glGetUniformLocation(h_ShaderProgram_PS, "u_ModelViewMatrixInvTrans");
 
+	h_ShaderProgram_GS = LoadShaders(shader_info_GS);
+	loc_ModelViewProjectionMatrix_GS = glGetUniformLocation(h_ShaderProgram_GS, "u_ModelViewProjectionMatrix");
+	loc_ModelViewMatrix_GS = glGetUniformLocation(h_ShaderProgram_GS, "u_ModelViewMatrix");
+	loc_ModelViewMatrixInvTrans_GS = glGetUniformLocation(h_ShaderProgram_GS, "u_ModelViewMatrixInvTrans");
+
+	/*
 	loc_global_ambient_color = glGetUniformLocation(h_ShaderProgram_PS, "u_global_ambient_color");
 	for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++) {
 		sprintf(string, "u_light[%d].light_on", i);
@@ -697,12 +811,12 @@ void prepare_shader_program(void) {
 	loc_material.specular_color = glGetUniformLocation(h_ShaderProgram_PS, "u_material.specular_color");
 	loc_material.emissive_color = glGetUniformLocation(h_ShaderProgram_PS, "u_material.emissive_color");
 	loc_material.specular_exponent = glGetUniformLocation(h_ShaderProgram_PS, "u_material.specular_exponent");
+	*/
 }
 
 void initialize_lights_and_material(void) { // follow OpenGL conventions for initialization
 	int i;
-
-	glUseProgram(h_ShaderProgram_PS);
+	glUseProgram(*shader_program);
 
 	glUniform4f(loc_global_ambient_color, 0.2f, 0.2f, 0.2f, 1.0f);
 	for (i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++) {
@@ -856,8 +970,10 @@ void initialize_OpenGL(void) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//glClearColor(0.12f, 0.18f, 0.12f, 1.0f);
 
+	//switch_shader_to(PHONG);
+
 	initialize_camera();
-	initialize_lights_and_material();
+	//initialize_lights_and_material();
 }
 
 void set_up_scene_lights(void) {
@@ -868,16 +984,6 @@ void set_up_scene_lights(void) {
 	light[0].position[1] = 0.0f;
 	light[0].position[2] = 10.0f;
 	light[0].position[3] = 1.0f;
-
-	/*
-	light[0].position[0] = 120.0f; light[0].position[1] = 0.0f; 	// spot light position in WC
-	light[0].position[2] = 25.0f; light[0].position[3] = 1.0f;
-
-	/*
-	light[0].ambient_color[0] = 0.2f; 
-	light[0].ambient_color[1] = 0.2f;
-	light[0].ambient_color[2] = 0.2f; light[0].ambient_color[3] = 1.0f;
-	*/
 
 	light[0].ambient_color[0] = 1.0f;
 	light[0].ambient_color[1] = 1.0f;
@@ -894,13 +1000,18 @@ void set_up_scene_lights(void) {
 	light[0].specular_color[2] = 1.0f;
 	light[0].specular_color[3] = 1.0f;
 
-	//light[0].diffuse_color[0] = 0.82f; light[0].diffuse_color[1] = 0.82f;
-	//light[0].diffuse_color[2] = 0.82f; light[0].diffuse_color[3] = 1.0f;
+	glUseProgram(*shader_program);
+	glUniform1i(loc_light[0].light_on, light[0].light_on);
+	glUniform4fv(loc_light[0].position, 1, light[0].position);
+	//glm::vec4 position_EC = ViewMatrix[MAIN_CAM] * glm::vec4(light[0].position[0], light[0].position[1],
+		//light[0].position[2], light[0].position[3]);
+	//glUniform4fv(loc_light[0].position, 1, &position_EC[0]);
+	glUniform4fv(loc_light[0].ambient_color, 1, light[0].ambient_color);
+	glUniform4fv(loc_light[0].diffuse_color, 1, light[0].diffuse_color);
+	glUniform4fv(loc_light[0].specular_color, 1, light[0].specular_color);
 
-	/*
-	light[0].specular_color[0] = 0.82f; light[0].specular_color[1] = 0.82f;
-	light[0].specular_color[2] = 0.82f; light[0].specular_color[3] = 1.0f;
-	*/
+	glUseProgram(0);
+
 
 	/*
 	light[0].spot_direction[0] = 0.0f;
@@ -910,13 +1021,6 @@ void set_up_scene_lights(void) {
 	light[0].spot_exponent = 7.0f;
 	*/
 
-	glUseProgram(h_ShaderProgram_PS);
-	glUniform1i(loc_light[0].light_on, light[0].light_on);
-	glUniform4fv(loc_light[0].position, 1, light[0].position);
-	glUniform4fv(loc_light[0].ambient_color, 1, light[0].ambient_color);
-	glUniform4fv(loc_light[0].diffuse_color, 1, light[0].diffuse_color);
-	glUniform4fv(loc_light[0].specular_color, 1, light[0].specular_color);
-
 	/*
 	glm::vec4 position_EC = ViewMatrix[MAIN_CAM] * glm::vec4(light[0].position[0], light[0].position[1],
 		light[0].position[2], light[0].position[3]);
@@ -947,16 +1051,14 @@ void set_up_scene_lights(void) {
 	glUniform3fv(loc_light[0].spot_direction, 1, &direction_EC[0]);
 	glUniform1f(loc_light[0].spot_cutoff_angle, light[0].spot_cutoff_angle);
 	glUniform1f(loc_light[0].spot_exponent, light[0].spot_exponent);
-	*/
-
-	glUseProgram(0);
+	*/	
 }
 
 void prepare_scene(void) {
 	char car_body[] = "Data/car_body_triangles_v.txt";
 	char car_wheel[] = "Data/car_wheel_triangles_v.txt";
 	char car_nut[] = "Data/car_nut_triangles_v.txt";
-
+	
 	define_axes();
 	define_static_objects();
 	define_animated_tiger();
@@ -966,7 +1068,7 @@ void prepare_scene(void) {
 	prepare_hier_obj(HIER_OBJ_CAR_WHEEL, car_wheel, HIER_OBJ_TYPE_V);
 	prepare_hier_obj(HIER_OBJ_CAR_NUT, car_nut, HIER_OBJ_TYPE_V);
 
-	set_up_scene_lights();
+	switch_shader_to(PHONG);
 }
 
 void initialize_renderer(void) {
