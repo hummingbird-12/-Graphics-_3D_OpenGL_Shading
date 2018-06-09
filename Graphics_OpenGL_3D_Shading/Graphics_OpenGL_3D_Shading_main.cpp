@@ -16,6 +16,10 @@ Light_Parameters light[NUMBER_OF_LIGHT_SUPPORTED];
 GLint loc_global_ambient_color;
 loc_light_Parameters loc_light[NUMBER_OF_LIGHT_SUPPORTED];
 loc_Material_Parameters loc_material;
+GLint loc_screen_effect, loc_screen_width;
+GLint loc_blind_effect, loc_cartoon_effect, loc_cartoon_level;
+int flag_draw_screen, flag_screen_effect, flag_blind_effect, flag_cartoon_effect;
+float screen_width, cartoon_level;
 
 #define PHONG	0
 #define GOURAUD 1
@@ -283,6 +287,14 @@ void switch_shader_to(int shader) {
 		loc_ModelViewProjectionMatrix = &loc_ModelViewProjectionMatrix_PS;
 		loc_ModelViewMatrix = &loc_ModelViewMatrix_PS;
 		loc_ModelViewMatrixInvTrans = &loc_ModelViewMatrixInvTrans_PS;
+
+		loc_screen_effect = glGetUniformLocation(*shader_program, "screen_effect");
+		loc_screen_width = glGetUniformLocation(*shader_program, "screen_width");
+
+		loc_blind_effect = glGetUniformLocation(*shader_program, "u_blind_effect");
+
+		loc_cartoon_effect = glGetUniformLocation(*shader_program, "u_cartoon_effect");
+		loc_cartoon_level = glGetUniformLocation(*shader_program, "u_cartoon_level");
 	}
 	else { // GOURAUD SHADING
 		shader_selected = GOURAUD;
@@ -605,9 +617,15 @@ void keyboard(unsigned char key, int x, int y) {
 		ViewProjectionMatrix[target_cam] = ProjectionMatrix[target_cam] * ViewMatrix[target_cam];
 		glutPostRedisplay();
 		break;
-	case 'p':
+	case 'p': // pause/resume animation
 	case 'P':
 		pause_animation = (pause_animation + 1) % 2;
+		break;
+	case 'c':
+	case 'C':
+		break;
+	case 'b':
+	case 'B':
 		break;
 	}
 }
@@ -776,36 +794,6 @@ void prepare_shader_program(void) {
 	loc_ModelViewProjectionMatrix_GS = glGetUniformLocation(h_ShaderProgram_GS, "u_ModelViewProjectionMatrix");
 	loc_ModelViewMatrix_GS = glGetUniformLocation(h_ShaderProgram_GS, "u_ModelViewMatrix");
 	loc_ModelViewMatrixInvTrans_GS = glGetUniformLocation(h_ShaderProgram_GS, "u_ModelViewMatrixInvTrans");
-
-	/*
-	loc_global_ambient_color = glGetUniformLocation(h_ShaderProgram_PS, "u_global_ambient_color");
-	for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++) {
-		sprintf(string, "u_light[%d].light_on", i);
-		loc_light[i].light_on = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].position", i);
-		loc_light[i].position = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].ambient_color", i);
-		loc_light[i].ambient_color = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].diffuse_color", i);
-		loc_light[i].diffuse_color = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].specular_color", i);
-		loc_light[i].specular_color = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].spot_direction", i);
-		loc_light[i].spot_direction = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].spot_exponent", i);
-		loc_light[i].spot_exponent = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].spot_cutoff_angle", i);
-		loc_light[i].spot_cutoff_angle = glGetUniformLocation(h_ShaderProgram_PS, string);
-		sprintf(string, "u_light[%d].light_attenuation_factors", i);
-		loc_light[i].light_attenuation_factors = glGetUniformLocation(h_ShaderProgram_PS, string);
-	}
-
-	loc_material.ambient_color = glGetUniformLocation(h_ShaderProgram_PS, "u_material.ambient_color");
-	loc_material.diffuse_color = glGetUniformLocation(h_ShaderProgram_PS, "u_material.diffuse_color");
-	loc_material.specular_color = glGetUniformLocation(h_ShaderProgram_PS, "u_material.specular_color");
-	loc_material.emissive_color = glGetUniformLocation(h_ShaderProgram_PS, "u_material.emissive_color");
-	loc_material.specular_exponent = glGetUniformLocation(h_ShaderProgram_PS, "u_material.specular_exponent");
-	*/
 }
 
 void initialize_lights_and_material(void) { // follow OpenGL conventions for initialization
@@ -836,6 +824,16 @@ void initialize_lights_and_material(void) { // follow OpenGL conventions for ini
 	glUniform4f(loc_material.specular_color, 0.0f, 0.0f, 0.0f, 1.0f);
 	glUniform4f(loc_material.emissive_color, 0.0f, 0.0f, 0.0f, 1.0f);
 	glUniform1f(loc_material.specular_exponent, 0.0f); // [0.0, 128.0]
+
+	if (shader_selected == PHONG) {
+		glUniform1i(loc_screen_effect, 0);
+		glUniform1f(loc_screen_width, 0.1f);
+
+		glUniform1i(loc_blind_effect, 0);
+
+		glUniform1i(loc_cartoon_effect, 0);
+		glUniform1i(loc_cartoon_level, 3.0f);
+	}
 
 	glUseProgram(0);
 }

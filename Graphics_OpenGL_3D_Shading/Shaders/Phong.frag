@@ -30,7 +30,7 @@ uniform float screen_width = 0.125f;
 uniform bool u_blind_effect = false;
 
 uniform bool u_cartoon_effect = false;
-uniform float u_cartoon_levels = 3.0f;
+uniform float u_cartoon_level = 3.0f;
 
 const float zero_f = 0.0f;
 const float one_f = 1.0f;
@@ -95,7 +95,7 @@ vec4 lighting_equation(in vec3 P_EC, in vec3 N_EC) {
 			tmp_float = dot(N_EC, L_EC);
 			if (tmp_float > zero_f) {
 				if(u_cartoon_effect)
-					local_color_sum += u_light[i].diffuse_color*u_material.diffuse_color*floor(tmp_float*u_cartoon_levels)/u_cartoon_levels;
+					local_color_sum += u_light[i].diffuse_color*u_material.diffuse_color*floor(tmp_float*u_cartoon_level)/u_cartoon_level;
 				else {
 					local_color_sum += u_light[i].diffuse_color*u_material.diffuse_color*tmp_float;
 			
