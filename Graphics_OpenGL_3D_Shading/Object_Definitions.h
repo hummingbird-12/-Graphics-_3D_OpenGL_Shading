@@ -1142,4 +1142,10 @@ void cleanup_OpenGL_stuffs(void) {
 
 	glDeleteVertexArrays(1, &VAO_axes);
 	glDeleteBuffers(1, &VBO_axes);
+
+	glDeleteVertexArrays(1, &points_VAO);
+	glDeleteBuffers(1, &points_VBO);
+
+	glDeleteVertexArrays(1, &line_VAO);
+	glDeleteBuffers(1, &line_VBO);
 }
