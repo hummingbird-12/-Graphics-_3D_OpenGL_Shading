@@ -430,12 +430,6 @@ void keyboard(unsigned char key, int x, int y) {
 	static int flag_cull_face = 1, polygon_fill_on = 1, depth_test_on = 0;
 	int target_cam = (ViewMode == EXTERIOR_MODE ? MAIN_CAM : CCTV_DYN);
 
-	if (glutGetModifiers() != GLUT_ACTIVE_SHIFT && shader_selected == GOURAUD) {
-		switch_shader_to(PHONG);
-		fprintf(stdout, "^^^ Switched to Phong Shading.\n");
-		glutPostRedisplay();
-	}
-
 	if (key == '5') {
 		switch_shader_to(1 - shader_selected);
 		fprintf(stdout, "^^^ Switched to %s Shading.\n", shader_selected ? "GOURAUD" : "PHONG");
