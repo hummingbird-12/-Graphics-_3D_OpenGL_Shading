@@ -21,6 +21,8 @@ GLint loc_blind_effect, loc_cartoon_effect, loc_cartoon_level;
 int flag_draw_screen, flag_screen_effect, flag_blind_effect, flag_cartoon_effect;
 float screen_width, cartoon_level;
 
+bool lightOff[NUMBER_OF_LIGHT_SUPPORTED];
+
 #define PHONG	0
 #define GOURAUD 1
 // for Phone Shading shaders
@@ -136,17 +138,16 @@ void display_camera(int camera_id) {
 
 	glUseProgram(*shader_program);
 
-	if (shader_selected == PHONG)
-		for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++)
-			if (light[i].spot_cutoff_angle != 180.0f) { // spot light
-				glm::vec4 position_EC = ViewMatrix[camera_id] *
-					glm::vec4(light[i].position[0], light[i].position[1], light[i].position[2], light[i].position[3]);
-				glUniform4fv(loc_light[i].position, 1, &position_EC[0]);
+	for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++)
+		if (light[i].spot_cutoff_angle != 180.0f) { // spot light
+			glm::vec4 position_EC = ViewMatrix[camera_id] *
+				glm::vec4(light[i].position[0], light[i].position[1], light[i].position[2], light[i].position[3]);
+			glUniform4fv(loc_light[i].position, 1, &position_EC[0]);
 
-				glm::vec3 direction_EC = glm::mat3(ViewMatrix[camera_id]) *
-					glm::vec3(light[i].spot_direction[0], light[i].spot_direction[1], light[i].spot_direction[2]);
-				glUniform3fv(loc_light[i].spot_direction, 1, &direction_EC[0]);
-			}
+			glm::vec3 direction_EC = glm::mat3(ViewMatrix[camera_id]) *
+				glm::vec3(light[i].spot_direction[0], light[i].spot_direction[1], light[i].spot_direction[2]);
+			glUniform3fv(loc_light[i].spot_direction, 1, &direction_EC[0]);
+		}
 
 	draw_car(camera_id);
 
@@ -451,21 +452,14 @@ void keyboard(unsigned char key, int x, int y) {
 	static int flag_cull_face = 1, polygon_fill_on = 1, depth_test_on = 0;
 	int target_cam = (ViewMode == EXTERIOR_MODE ? MAIN_CAM : CCTV_DYN);
 
-	if (key == '5') {
-		switch_shader_to(1 - shader_selected);
-		fprintf(stdout, "^^^ Switched to %s Shading.\n", shader_selected ? "GOURAUD" : "PHONG");
-		glutPostRedisplay();
-		return;
-	}
-
 	if ((key >= '1') && (key <= '1' + NUMBER_OF_LIGHT_SUPPORTED - 1)) {
 		int light_ID = (int)(key - '1');
 
-		fprintf(stdout, "^^^ Turned %s light %d.\n", light[light_ID].light_on ? "off" : "on", light_ID);
+		fprintf(stdout, "^^^ Turned %s light %d.\n", light[light_ID].light_on ? "off" : "on", light_ID + 1);
 
 		glUseProgram(*shader_program);
-		light[light_ID].light_on = 1 - light[light_ID].light_on;
-		glUniform1i(loc_light[light_ID].light_on, light[light_ID].light_on);
+		lightOff[light_ID] = 1 - lightOff[light_ID];
+		glUniform1i(loc_light[light_ID].light_on, 1 - lightOff[light_ID]);
 		glUseProgram(0);
 
 		glutPostRedisplay();
@@ -649,6 +643,12 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'V':
 		if (shader_selected == PHONG) {
 		}
+		break;
+	case 'g':
+	case 'G':
+		switch_shader_to(1 - shader_selected);
+		fprintf(stdout, "^^^ Switched to %s Shading.\n", shader_selected ? "GOURAUD" : "PHONG");
+		glutPostRedisplay();
 		break;
 	}
 }
@@ -849,13 +849,13 @@ void initialize_lights_and_material(void) { // follow OpenGL conventions for ini
 	glUniform1f(loc_material.specular_exponent, 0.0f); // [0.0, 128.0]
 
 	if (shader_selected == PHONG) {
-		glUniform1i(loc_screen_effect, 0);
-		glUniform1f(loc_screen_width, 0.1f);
+		glUniform1i(loc_screen_effect, flag_screen_effect);
+		glUniform1f(loc_screen_width, screen_width);
 
-		glUniform1i(loc_blind_effect, 0);
+		glUniform1i(loc_blind_effect, flag_blind_effect);
 
-		glUniform1i(loc_cartoon_effect, 0);
-		glUniform1i(loc_cartoon_level, 3.0f);
+		glUniform1i(loc_cartoon_effect, flag_cartoon_effect);
+		glUniform1f(loc_cartoon_level, cartoon_level);
 	}
 
 	glUseProgram(0);
@@ -985,6 +985,10 @@ void initialize_OpenGL(void) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//glClearColor(0.12f, 0.18f, 0.12f, 1.0f);
 
+	flag_draw_screen = flag_screen_effect = flag_blind_effect = flag_cartoon_effect = 0;
+	screen_width = 0.125f;
+	cartoon_level = 3.0f;
+
 	initialize_camera();
 }
 
@@ -992,7 +996,7 @@ void set_up_scene_lights(void) {
 	glUseProgram(*shader_program);
 
 	// light 0 : point light in EC
-	light[0].light_on = 1;
+	light[0].light_on = 1 - lightOff[0];
 
 	light[0].position[0] = 0.0f;
 	light[0].position[1] = 0.0f;
@@ -1049,7 +1053,7 @@ void set_up_scene_lights(void) {
 	light[5].position[3] = 1.0f;
 
 	for (int i = 1; i <= 5; i++) {
-		light[i].light_on = 1;
+		light[i].light_on = 1 - lightOff[i];
 
 		light[i].ambient_color[0] = 1.0f;
 		light[i].ambient_color[1] = 1.0f;
