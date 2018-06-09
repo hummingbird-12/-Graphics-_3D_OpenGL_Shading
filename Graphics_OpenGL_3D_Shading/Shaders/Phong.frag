@@ -19,7 +19,7 @@ struct MATERIAL {
 };
 
 uniform vec4 u_global_ambient_color;
-#define NUMBER_OF_LIGHTS_SUPPORTED 1
+#define NUMBER_OF_LIGHTS_SUPPORTED 6
 uniform LIGHT u_light[NUMBER_OF_LIGHTS_SUPPORTED];
 uniform MATERIAL u_material;
 
