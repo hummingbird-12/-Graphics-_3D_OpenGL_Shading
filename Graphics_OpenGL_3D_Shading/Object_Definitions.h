@@ -354,7 +354,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_IRONMAN].ModelMatrix[0] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[0], 90.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[0] = glm::scale(static_objects[OBJ_IRONMAN].ModelMatrix[0], glm::vec3(8.0f, 8.0f, 8.0f));
 
-	static_objects[OBJ_IRONMAN].material[0].emission = glm::vec4(25.0f / 255.0f, 0.0f / 255.0f, 0.0f / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[0].emission = glm::vec4(25.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[0].ambient = glm::vec4(40.0f / 255.0f, 0.0f / 255.0f, 0.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[0].diffuse = glm::vec4(170.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[0].specular = glm::vec4(190.0f / 255.0f, 50.0f / 255.0f, 40.0 / 255.0f, 1.0f);
@@ -366,7 +366,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::rotate(static_objects[OBJ_IRONMAN].ModelMatrix[1], 90.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
 	static_objects[OBJ_IRONMAN].ModelMatrix[1] = glm::scale(static_objects[OBJ_IRONMAN].ModelMatrix[1], glm::vec3(8.0f, 8.0f, 8.0f));
 
-	static_objects[OBJ_IRONMAN].material[1].emission = glm::vec4(100.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f, 1.0f);
+	static_objects[OBJ_IRONMAN].material[1].emission = glm::vec4(20.0f / 255.0f, 10.0f / 255.0f, 10.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[1].ambient = glm::vec4(0.3f, 0.15f, 0.1f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[1].diffuse = glm::vec4(207.0f / 255.0f, 164.0f / 255.0f, 119.0f / 255.0f, 1.0f);
 	static_objects[OBJ_IRONMAN].material[1].specular = glm::vec4(215.0f / 255.0f, 188.0f / 255.0f, 160.0f / 255.0f, 1.0f);
@@ -386,9 +386,9 @@ void define_static_objects(void) {
 	static_objects[OBJ_TANK].ModelMatrix[0] = glm::scale(static_objects[OBJ_TANK].ModelMatrix[0], glm::vec3(4.0f, 4.0f, 4.0f));
 	static_objects[OBJ_TANK].ModelMatrix[0] = glm::translate(static_objects[OBJ_TANK].ModelMatrix[0], glm::vec3(0.0f, -15.0f, 0.0f));
 
-	static_objects[OBJ_TANK].material[0].emission = glm::vec4(178 / 255.0f, 94 / 255.0f, 218 / 255.0f, 0.63f / 255.0f);
+	static_objects[OBJ_TANK].material[0].emission = glm::vec4(15 / 255.0f, 3 / 255.0f, 21 / 255.0f, 1.0f);
 	static_objects[OBJ_TANK].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
-	static_objects[OBJ_TANK].material[0].diffuse = glm::vec4(178 / 255.0f, 94 / 255.0f, 218 / 255.0f, 0.63f / 255.0f);
+	static_objects[OBJ_TANK].material[0].diffuse = glm::vec4(178 / 255.0f, 94 / 255.0f, 218 / 255.0f, 1.0f);
 	static_objects[OBJ_TANK].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
 	static_objects[OBJ_TANK].material[0].exponent = 128.0f*0.1f;
 
@@ -397,9 +397,9 @@ void define_static_objects(void) {
 	static_objects[OBJ_TANK].ModelMatrix[1] = glm::scale(static_objects[OBJ_TANK].ModelMatrix[1], glm::vec3(4.0f, 4.0f, 4.0f));
 	static_objects[OBJ_TANK].ModelMatrix[1] = glm::translate(static_objects[OBJ_TANK].ModelMatrix[1], glm::vec3(0.0f, -15.0f, 0.0f));
 
-	static_objects[OBJ_TANK].material[1].emission = glm::vec4(94 / 255.0f, 218 / 255.0f, 184 / 255.0f, 0.63 / 255.0f);
+	static_objects[OBJ_TANK].material[1].emission = glm::vec4(3 / 255.0f, 21 / 255.0f, 15 / 255.0f, 1.0f);
 	static_objects[OBJ_TANK].material[1].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
-	static_objects[OBJ_TANK].material[1].diffuse = glm::vec4(94 / 255.0f, 218 / 255.0f, 184 / 255.0f, 0.63 / 255.0f);
+	static_objects[OBJ_TANK].material[1].diffuse = glm::vec4(94 / 255.0f, 218 / 255.0f, 184 / 255.0f, 1.0f);
 	static_objects[OBJ_TANK].material[1].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
 	static_objects[OBJ_TANK].material[1].exponent = 128.0f*0.1f;
 
@@ -412,14 +412,14 @@ void define_static_objects(void) {
 
 	static_objects[OBJ_GODZILLA].n_geom_instances = 1;
 
-	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::translate(glm::mat4(1.0f), glm::vec3(80.0f, 65.0f, 0.0f));
-	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::scale(static_objects[OBJ_GODZILLA].ModelMatrix[0], glm::vec3(0.15f, 0.15f, 0.25f));
+	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::translate(glm::mat4(1.0f), glm::vec3(80.0f, 45.0f, 0.0f));
+	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::scale(static_objects[OBJ_GODZILLA].ModelMatrix[0], glm::vec3(0.15f, 0.10f, 0.25f));
 	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::rotate(static_objects[OBJ_GODZILLA].ModelMatrix[0], 180.0f * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	static_objects[OBJ_GODZILLA].ModelMatrix[0] = glm::rotate(static_objects[OBJ_GODZILLA].ModelMatrix[0], 90.0f * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
-	static_objects[OBJ_GODZILLA].material[0].emission = glm::vec4(218 / 255.0f, 199 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
+	static_objects[OBJ_GODZILLA].material[0].emission = glm::vec4(21 / 255.0f, 19 / 255.0f, 3 / 255.0f, 1.0f);
 	static_objects[OBJ_GODZILLA].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
-	static_objects[OBJ_GODZILLA].material[0].diffuse = glm::vec4(218 / 255.0f, 199 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
+	static_objects[OBJ_GODZILLA].material[0].diffuse = glm::vec4(218 / 255.0f, 199 / 255.0f, 94 / 255.0f, 1.0f);
 	static_objects[OBJ_GODZILLA].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
 	static_objects[OBJ_GODZILLA].material[0].exponent = 128.0f*0.1f;
 
@@ -437,9 +437,9 @@ void define_static_objects(void) {
 
 	static_objects[OBJ_BUS].n_geom_instances = 1;
 
-	static_objects[OBJ_BUS].material[0].emission = glm::vec4(218 / 255.0f, 94 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
+	static_objects[OBJ_BUS].material[0].emission = glm::vec4(21 / 255.0f, 3 / 255.0f, 3 / 255.0f, 1.0f);
 	static_objects[OBJ_BUS].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
-	static_objects[OBJ_BUS].material[0].diffuse = glm::vec4(218 / 255.0f, 94 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
+	static_objects[OBJ_BUS].material[0].diffuse = glm::vec4(218 / 255.0f, 94 / 255.0f, 94 / 255.0f, 1.0f);
 	static_objects[OBJ_BUS].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
 	static_objects[OBJ_BUS].material[0].exponent = 128.0f*0.1f;
 
@@ -457,9 +457,9 @@ void define_static_objects(void) {
 
 	static_objects[OBJ_BIKE].n_geom_instances = 1;
 
-	static_objects[OBJ_BIKE].material[0].emission = glm::vec4(156 / 255.0f, 218 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
+	static_objects[OBJ_BIKE].material[0].emission = glm::vec4(15 / 255.0f, 21 / 255.0f, 3 / 255.0f, 1.0f);
 	static_objects[OBJ_BIKE].material[0].ambient = glm::vec4(0.19125f, 0.0735f, 0.0225f, 1.0f);
-	static_objects[OBJ_BIKE].material[0].diffuse = glm::vec4(156 / 255.0f, 218 / 255.0f, 94 / 255.0f, 0.72 / 255.0f);
+	static_objects[OBJ_BIKE].material[0].diffuse = glm::vec4(156 / 255.0f, 218 / 255.0f, 94 / 255.0f, 1.0f);
 	static_objects[OBJ_BIKE].material[0].specular = glm::vec4(0.256777f, 0.137622f, 0.086014f, 1.0f);
 	static_objects[OBJ_BIKE].material[0].exponent = 128.0f*0.1f;
 
@@ -646,22 +646,22 @@ void prepare_hier_obj(int hier_obj_ID, char *filename, HIER_OBJ_TYPE hier_obj_ty
 
 	if (!hier_obj_ID) {
 		// material for CAR_BODY
-		material_car[HIER_OBJ_CAR_BODY].ambient_color[0] = 50 / 255.0f;
-		material_car[HIER_OBJ_CAR_BODY].ambient_color[1] = 80 / 255.0f;
-		material_car[HIER_OBJ_CAR_BODY].ambient_color[2] = 10 / 255.0f;
+		material_car[HIER_OBJ_CAR_BODY].ambient_color[0] = 13 / 255.0f;
+		material_car[HIER_OBJ_CAR_BODY].ambient_color[1] = 25 / 255.0f;
+		material_car[HIER_OBJ_CAR_BODY].ambient_color[2] = 3 / 255.0f;
 		material_car[HIER_OBJ_CAR_BODY].ambient_color[3] = 1.0f;
 
 		material_car[HIER_OBJ_CAR_BODY].diffuse_color[0] = 134 / 255.0f;
-		material_car[HIER_OBJ_CAR_BODY].diffuse_color[1] = 211 / 255.0f;
+		material_car[HIER_OBJ_CAR_BODY].diffuse_color[1] = 180 / 255.0f;
 		material_car[HIER_OBJ_CAR_BODY].diffuse_color[2] = 39 / 255.0f;
 		material_car[HIER_OBJ_CAR_BODY].diffuse_color[3] = 1.0f;
 
-		material_car[HIER_OBJ_CAR_BODY].specular_color[0] = 190 / 255.0f;
-		material_car[HIER_OBJ_CAR_BODY].specular_color[1] = 240 / 255.0f;
+		material_car[HIER_OBJ_CAR_BODY].specular_color[0] = 160 / 255.0f;
+		material_car[HIER_OBJ_CAR_BODY].specular_color[1] = 190 / 255.0f;
 		material_car[HIER_OBJ_CAR_BODY].specular_color[2] = 10 / 255.0f;
 		material_car[HIER_OBJ_CAR_BODY].specular_color[3] = 1.0f;
 
-		material_car[HIER_OBJ_CAR_BODY].specular_exponent = 3.0f;
+		material_car[HIER_OBJ_CAR_BODY].specular_exponent = 20.0f;
 
 		material_car[HIER_OBJ_CAR_BODY].emissive_color[0] = 0.0f;
 		material_car[HIER_OBJ_CAR_BODY].emissive_color[1] = 0.1f;
@@ -670,8 +670,8 @@ void prepare_hier_obj(int hier_obj_ID, char *filename, HIER_OBJ_TYPE hier_obj_ty
 
 
 		// material for CAR_WHEEL
-		material_car[HIER_OBJ_CAR_WHEEL].ambient_color[0] = 150 / 255.0f;
-		material_car[HIER_OBJ_CAR_WHEEL].ambient_color[1] = 100 / 255.0f;
+		material_car[HIER_OBJ_CAR_WHEEL].ambient_color[0] = 70 / 255.0f;
+		material_car[HIER_OBJ_CAR_WHEEL].ambient_color[1] = 30 / 255.0f;
 		material_car[HIER_OBJ_CAR_WHEEL].ambient_color[2] = 12 / 255.0f;
 		material_car[HIER_OBJ_CAR_WHEEL].ambient_color[3] = 1.0f;
 
@@ -687,16 +687,16 @@ void prepare_hier_obj(int hier_obj_ID, char *filename, HIER_OBJ_TYPE hier_obj_ty
 
 		material_car[HIER_OBJ_CAR_WHEEL].specular_exponent = 3.0f;
 
-		material_car[HIER_OBJ_CAR_WHEEL].emissive_color[0] = 0.3f;
+		material_car[HIER_OBJ_CAR_WHEEL].emissive_color[0] = 0.2f;
 		material_car[HIER_OBJ_CAR_WHEEL].emissive_color[1] = 0.0f;
 		material_car[HIER_OBJ_CAR_WHEEL].emissive_color[2] = 0.0f;
 		material_car[HIER_OBJ_CAR_WHEEL].emissive_color[3] = 1.0f;
 
 
 		// material for CAR_NUT
-		material_car[HIER_OBJ_CAR_NUT].ambient_color[0] = 120 / 255.0f;
-		material_car[HIER_OBJ_CAR_NUT].ambient_color[1] = 40 / 255.0f;
-		material_car[HIER_OBJ_CAR_NUT].ambient_color[2] = 40 / 255.0f;
+		material_car[HIER_OBJ_CAR_NUT].ambient_color[0] = 80 / 255.0f;
+		material_car[HIER_OBJ_CAR_NUT].ambient_color[1] = 20 / 255.0f;
+		material_car[HIER_OBJ_CAR_NUT].ambient_color[2] = 20 / 255.0f;
 		material_car[HIER_OBJ_CAR_NUT].ambient_color[3] = 1.0f;
 
 		material_car[HIER_OBJ_CAR_NUT].diffuse_color[0] = 215 / 255.0f;
@@ -711,7 +711,7 @@ void prepare_hier_obj(int hier_obj_ID, char *filename, HIER_OBJ_TYPE hier_obj_ty
 
 		material_car[HIER_OBJ_CAR_NUT].specular_exponent = 3.0f;
 
-		material_car[HIER_OBJ_CAR_NUT].emissive_color[0] = 0.4f;
+		material_car[HIER_OBJ_CAR_NUT].emissive_color[0] = 0.2f;
 		material_car[HIER_OBJ_CAR_NUT].emissive_color[1] = 0.0f;
 		material_car[HIER_OBJ_CAR_NUT].emissive_color[2] = 0.0f;
 		material_car[HIER_OBJ_CAR_NUT].emissive_color[3] = 1.0f;

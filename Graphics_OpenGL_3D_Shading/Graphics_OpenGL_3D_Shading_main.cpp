@@ -22,6 +22,8 @@ int flag_draw_screen, flag_blind_effect, flag_cartoon_effect, flag_screen_effect
 float blind_intensity, cartoon_level, screen_width;
 
 bool lightOff[NUMBER_OF_LIGHT_SUPPORTED];
+bool flag_random_light;
+float light_seed[3] = { 1.0f, 1.0f, 1.0f };
 
 #define PHONG	0
 #define GOURAUD 1
@@ -107,6 +109,8 @@ glm::mat3 ModelViewMatrixInvTrans;
 #define TO_RADIAN 0.01745329252f  
 #define TO_DEGREE 57.295779513f
 
+void switch_shader_to(int);
+
 void set_ViewMatrix(int camera_id) {
 	ViewMatrix[camera_id] = glm::mat4(1.0f);
 	ViewMatrix[camera_id][0].x = camera[camera_id].uaxis.x;
@@ -138,16 +142,17 @@ void display_camera(int camera_id) {
 
 	glUseProgram(*shader_program);
 	
-	for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++)
-		if (light[i].spot_cutoff_angle != 180.0f) { // spot light
-			glm::vec4 position_EC = ViewMatrix[camera_id] *
-				glm::vec4(light[i].position[0], light[i].position[1], light[i].position[2], light[i].position[3]);
-			glUniform4fv(loc_light[i].position, 1, &position_EC[0]);
+	for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++) {
+		glm::vec4 position_EC = ViewMatrix[camera_id] *
+			glm::vec4(light[i].position[0], light[i].position[1], light[i].position[2], light[i].position[3]);
+		glUniform4fv(loc_light[i].position, 1, &position_EC[0]);
 
+		if (light[i].spot_cutoff_angle != 180.0f) { // spot light
 			glm::vec3 direction_EC = glm::mat3(ViewMatrix[camera_id]) *
 				glm::vec3(light[i].spot_direction[0], light[i].spot_direction[1], light[i].spot_direction[2]);
 			glUniform3fv(loc_light[i].spot_direction, 1, &direction_EC[0]);
 		}
+	}
 
 	draw_static_object(&(static_objects[OBJ_BUILDING]), 0, camera_id);
 
@@ -161,8 +166,6 @@ void display_camera(int camera_id) {
 	draw_static_object(&(static_objects[OBJ_LIGHT]), 4, camera_id);
 
 	draw_static_object(&(static_objects[OBJ_TEAPOT]), 0, camera_id);
-	draw_static_object(&(static_objects[OBJ_TEAPOT]), 1, camera_id);
-	draw_static_object(&(static_objects[OBJ_TEAPOT]), 2, camera_id);
 
 	draw_static_object(&(static_objects[OBJ_NEW_CHAIR]), 0, camera_id);
 	draw_static_object(&(static_objects[OBJ_FRAME]), 0, camera_id);
@@ -260,6 +263,8 @@ void display_camera(int camera_id) {
 
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	switch_shader_to(shader_selected);
 
 	ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(35.0f, 35.0f, 0.0f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, car_rotation_angle * 9.0f * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -640,6 +645,35 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'c': // toggle cartoon effect
 	case 'C':
 		if (shader_selected == PHONG) {
+			flag_cartoon_effect = 1 - flag_cartoon_effect;
+			glUseProgram(*shader_program);
+			glUniform1i(loc_cartoon_effect, flag_cartoon_effect);
+			glUseProgram(0);
+			glutPostRedisplay();
+		}
+		break;
+	case 'n': // decrease cartoon intensity
+	case 'N':
+		if (shader_selected == PHONG && flag_cartoon_effect) {
+			if (cartoon_level - 0.1f > 0.0f) {
+				cartoon_level -= 0.1f;
+				glUseProgram(*shader_program);
+				glUniform1i(loc_cartoon_effect, flag_cartoon_effect);
+				glUseProgram(0);
+			}
+			glutPostRedisplay();
+		}
+		break;
+	case 'm': // increase cartoon intensity
+	case 'M':
+		if (shader_selected == PHONG && flag_cartoon_effect) {
+			if (cartoon_level + 0.1f <= 6.0f) {
+				cartoon_level += 0.1f;
+				glUseProgram(*shader_program);
+				glUniform1i(loc_cartoon_effect, flag_cartoon_effect);
+				glUseProgram(0);
+			}
+			glutPostRedisplay();
 		}
 		break;
 	case 'b': // toggle blind effect
@@ -652,7 +686,7 @@ void keyboard(unsigned char key, int x, int y) {
 			glutPostRedisplay();
 		}
 		break;
-	case '<':
+	case '<': // make blind effect less blind
 		if (shader_selected == PHONG && flag_blind_effect) {
 			if (blind_intensity + 3.0f <= 180.0f)
 				blind_intensity += 3.0f;
@@ -662,7 +696,7 @@ void keyboard(unsigned char key, int x, int y) {
 			glutPostRedisplay();
 		}
 		break;
-	case '>':
+	case '>': // make blind effect blinder
 		if (shader_selected == PHONG && flag_blind_effect) {
 			if (blind_intensity - 3.0f >= 0.0f)
 				blind_intensity -= 3.0f;
@@ -712,6 +746,8 @@ void keyboard(unsigned char key, int x, int y) {
 		fprintf(stdout, "^^^ Switched to %s Shading.\n", shader_selected ? "GOURAUD" : "PHONG");
 		glutPostRedisplay();
 		break;
+	case '?':
+		flag_random_light = 1 - flag_random_light;
 	}
 }
 
@@ -829,6 +865,9 @@ void timer_scene(int timestamp_scene) {
 		}
 	}
 
+	light_seed[0] = (rand() * timestamp_scene) % 255;
+	light_seed[1] = (rand() * timestamp_scene) % 255;
+	light_seed[2] = (rand() * timestamp_scene) % 255;
 	tiger_data.cur_frame = timestamp_scene % N_TIGER_FRAMES;
 	car_rotation_angle = timestamp_scene % 360;
 	glutPostRedisplay();
@@ -1054,6 +1093,7 @@ void initialize_OpenGL(void) {
 	screen_width = 0.5f;
 	cartoon_level = 3.0f;
 	blind_intensity = 90.0f;
+	flag_random_light = false;
 
 	initialize_camera();
 }
@@ -1064,10 +1104,17 @@ void set_up_scene_lights(void) {
 	// light 0 : point light in EC of MAIN_CAM
 	light[0].light_on = 1 - lightOff[0];
 
+	light[0].position[0] = camera[MAIN_CAM].pos.x;
+	light[0].position[1] = camera[MAIN_CAM].pos.y;
+	light[0].position[2] = camera[MAIN_CAM].pos.z;
+	light[0].position[3] = 1.0f;
+
+	/*
 	light[0].position[0] = 0.0f;
 	light[0].position[1] = 0.0f;
 	light[0].position[2] = 10.0f;
 	light[0].position[3] = 1.0f;
+	*/
 
 	light[0].ambient_color[0] = 1.0f;
 	light[0].ambient_color[1] = 1.0f;
@@ -1084,13 +1131,21 @@ void set_up_scene_lights(void) {
 	light[0].specular_color[2] = 1.0f;
 	light[0].specular_color[3] = 1.0f;
 
-	light[0].spot_cutoff_angle = 180.0f;
+	light[0].spot_cutoff_angle = camera[MAIN_CAM].fov_y;
+	light[0].spot_exponent = 30.0f;
+
+	light[0].spot_direction[0] = -camera[MAIN_CAM].naxis.x;
+	light[0].spot_direction[1] = -camera[MAIN_CAM].naxis.y;
+	light[0].spot_direction[2] = -camera[MAIN_CAM].naxis.z;
 
 	glUniform1i(loc_light[0].light_on, light[0].light_on);
-	glUniform4fv(loc_light[0].position, 1, light[0].position);
+	//glUniform4fv(loc_light[0].position, 1, light[0].position);
 	glUniform4fv(loc_light[0].ambient_color, 1, light[0].ambient_color);
 	glUniform4fv(loc_light[0].diffuse_color, 1, light[0].diffuse_color);
 	glUniform4fv(loc_light[0].specular_color, 1, light[0].specular_color);
+
+	glUniform1f(loc_light[0].spot_cutoff_angle, light[0].spot_cutoff_angle);
+	glUniform1f(loc_light[0].spot_exponent, light[0].spot_exponent);
 
 	// light 1, 2, 3, 4, 5 : spot light in WC
 	light[1].position[0] = 120.0f;
@@ -1126,9 +1181,16 @@ void set_up_scene_lights(void) {
 		light[i].ambient_color[2] = 1.0f;
 		light[i].ambient_color[3] = 1.0f;
 
-		light[i].diffuse_color[0] = 1.0f;
-		light[i].diffuse_color[1] = 1.0f;
-		light[i].diffuse_color[2] = 1.0f;
+		if (flag_random_light) {
+			light[i].diffuse_color[0] = ((int)(light_seed[0] * i * 30) % 256) / 255.0f;
+			light[i].diffuse_color[1] = ((int)(light_seed[1] * i * 20) % 256) / 255.0f;
+			light[i].diffuse_color[2] = ((int)(light_seed[2] * i * 50) % 256) / 255.0f;
+		}
+		else {
+			light[i].diffuse_color[0] = 1.0f;
+			light[i].diffuse_color[1] = 1.0f;
+			light[i].diffuse_color[2] = 1.0f;
+		}
 		light[i].diffuse_color[3] = 1.0f;
 
 		light[i].specular_color[0] = 1.0f;
