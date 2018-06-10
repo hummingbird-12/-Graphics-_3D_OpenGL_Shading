@@ -219,7 +219,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_TEAPOT].front_face_mode = GL_CCW;
 	prepare_geom_of_static_object(&(static_objects[OBJ_TEAPOT]));
 
-	static_objects[OBJ_TEAPOT].n_geom_instances = 3;
+	static_objects[OBJ_TEAPOT].n_geom_instances = 1;
 
 	static_objects[OBJ_TEAPOT].ModelMatrix[0] = glm::translate(glm::mat4(1.0f), glm::vec3(193.0f, 120.0f, 11.0f));
 	static_objects[OBJ_TEAPOT].ModelMatrix[0] = glm::scale(static_objects[OBJ_TEAPOT].ModelMatrix[0],
@@ -231,6 +231,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_TEAPOT].material[0].specular = glm::vec4(0.727811f, 0.626959f, 0.626959f, 1.0f);
 	static_objects[OBJ_TEAPOT].material[0].exponent = 128.0f*0.6;
 
+	/*
 	static_objects[OBJ_TEAPOT].ModelMatrix[1] = glm::translate(glm::mat4(1.0f), glm::vec3(35.0f, 40.0f, 0.0f));
 	static_objects[OBJ_TEAPOT].ModelMatrix[1] = glm::scale(static_objects[OBJ_TEAPOT].ModelMatrix[1],
 		glm::vec3(2.2f, 2.5f, 2.0f));
@@ -250,7 +251,7 @@ void define_static_objects(void) {
 	static_objects[OBJ_TEAPOT].material[2].diffuse = glm::vec4(0.04136f, 0.04136f, 0.61424f, 1.0f);
 	static_objects[OBJ_TEAPOT].material[2].specular = glm::vec4(0.727811f, 0.626959f, 0.626959f, 1.0f);
 	static_objects[OBJ_TEAPOT].material[2].exponent = 128.0f*0.6;
-
+	*/
 	// new_chair
 	strcpy(static_objects[OBJ_NEW_CHAIR].filename, "Data/new_chair_vnt.geom");
 	static_objects[OBJ_NEW_CHAIR].n_fields = 8;
@@ -1126,6 +1127,91 @@ void draw_line(int camera_id, float x1, float y1, float z1, float x2, float y2, 
 	glBindVertexArray(0);
 }
 
+
+// Screen effect rectangle
+
+GLuint screen_VBO, screen_VAO;
+GLfloat screen_vertices[][3] = {  // vertices enumerated counterclockwise
+	{ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f },
+	{ 1.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f },
+	{ 1.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }
+};
+
+Material_Parameters material_screen;
+
+void define_screen(void) {
+	// Initialize vertex buffer object.
+	glGenBuffers(1, &screen_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, screen_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertices), &screen_vertices[0][0], GL_STATIC_DRAW);
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &screen_VAO);
+	glBindVertexArray(screen_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, screen_VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	material_screen.ambient_color[0] = 5 / 255.0f;;
+	material_screen.ambient_color[1] = 90 / 255.0f;
+	material_screen.ambient_color[2] = 100 / 255.0f;
+	material_screen.ambient_color[3] = 1.0f;
+
+	material_screen.diffuse_color[0] = 10 / 255.0f;
+	material_screen.diffuse_color[1] = 130 / 255.0f;
+	material_screen.diffuse_color[2] = 150 / 255.0f;
+	material_screen.diffuse_color[3] = 1.0f;
+
+	material_screen.specular_color[0] = 75 / 255.0f;
+	material_screen.specular_color[1] = 190 / 255.0f;
+	material_screen.specular_color[2] = 210 / 255.0f;
+	material_screen.specular_color[3] = 1.0f;
+
+	material_screen.specular_exponent = 20.5f;
+
+	material_screen.emissive_color[0] = 0.05f;
+	material_screen.emissive_color[1] = 0.15f;
+	material_screen.emissive_color[2] = 0.2f;
+	material_screen.emissive_color[3] = 1.0f;
+}
+
+void set_material_screen(void) {
+	// assume ShaderProgram_PS/GS is used
+	glUniform4fv(loc_material.ambient_color, 1, material_screen.ambient_color);
+	glUniform4fv(loc_material.diffuse_color, 1, material_screen.diffuse_color);
+	glUniform4fv(loc_material.specular_color, 1, material_screen.specular_color);
+	glUniform1f(loc_material.specular_exponent, material_screen.specular_exponent);
+	glUniform4fv(loc_material.emissive_color, 1, material_screen.emissive_color);
+}
+
+void draw_screen(int camera_id) {
+	glm::mat4 ModelMatrix_screen = glm::translate(glm::mat4(1.0f), glm::vec3(117.0f, 125.0f, 0.0f));
+	ModelMatrix_screen = glm::rotate(ModelMatrix_screen, 90.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelMatrix_screen = glm::scale(ModelMatrix_screen, glm::vec3(50.0f, 30.0f, 1.0f));
+	ModelMatrix_screen = glm::translate(ModelMatrix_screen, glm::vec3(-1.0f, 0.0f, 0.0f));
+
+	ModelViewMatrix[camera_id] = ViewMatrix[camera_id] * ModelMatrix_screen;
+	ModelViewProjectionMatrix = ProjectionMatrix[camera_id] * ModelViewMatrix[camera_id];
+	ModelViewMatrixInvTrans = glm::inverseTranspose(glm::mat3(ModelViewMatrix[camera_id]));
+
+	glUniformMatrix4fv(*loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glUniformMatrix4fv(*loc_ModelViewMatrix, 1, GL_FALSE, &ModelViewMatrix[camera_id][0][0]);
+	glUniformMatrix3fv(*loc_ModelViewMatrixInvTrans, 1, GL_FALSE, &ModelViewMatrixInvTrans[0][0]);
+
+	glFrontFace(GL_CCW);
+
+	glBindVertexArray(screen_VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+}
+
 void cleanup_OpenGL_stuffs(void) {
 	for (int i = 0; i < n_static_objects; i++) {
 		glDeleteVertexArrays(1, &(static_objects[i].VAO));
@@ -1148,4 +1234,7 @@ void cleanup_OpenGL_stuffs(void) {
 
 	glDeleteVertexArrays(1, &line_VAO);
 	glDeleteBuffers(1, &line_VBO);
+
+	glDeleteVertexArrays(1, &screen_VAO);
+	glDeleteBuffers(1, &screen_VBO);
 }

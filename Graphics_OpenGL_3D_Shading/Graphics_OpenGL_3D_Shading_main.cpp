@@ -16,11 +16,10 @@ Light_Parameters light[NUMBER_OF_LIGHT_SUPPORTED];
 GLint loc_global_ambient_color;
 loc_light_Parameters loc_light[NUMBER_OF_LIGHT_SUPPORTED];
 loc_Material_Parameters loc_material;
-GLint loc_screen_effect, loc_screen_width;
-GLint loc_blind_effect, loc_cartoon_effect;
-GLfloat loc_blind_intensity, loc_cartoon_level;
-int flag_draw_screen, flag_screen_effect, flag_blind_effect, flag_cartoon_effect;
-float blind_intensity, screen_width, cartoon_level;
+GLint loc_blind_effect, loc_cartoon_effect, loc_screen_effect;
+GLint loc_blind_intensity, loc_cartoon_level, loc_screen_width;
+int flag_draw_screen, flag_blind_effect, flag_cartoon_effect, flag_screen_effect;
+float blind_intensity, cartoon_level, screen_width;
 
 bool lightOff[NUMBER_OF_LIGHT_SUPPORTED];
 
@@ -138,7 +137,7 @@ void display_camera(int camera_id) {
 	glLineWidth(1.0f);
 
 	glUseProgram(*shader_program);
-
+	
 	for (int i = 0; i < NUMBER_OF_LIGHT_SUPPORTED; i++)
 		if (light[i].spot_cutoff_angle != 180.0f) { // spot light
 			glm::vec4 position_EC = ViewMatrix[camera_id] *
@@ -149,8 +148,6 @@ void display_camera(int camera_id) {
 				glm::vec3(light[i].spot_direction[0], light[i].spot_direction[1], light[i].spot_direction[2]);
 			glUniform3fv(loc_light[i].spot_direction, 1, &direction_EC[0]);
 		}
-
-	draw_car(camera_id);
 
 	draw_static_object(&(static_objects[OBJ_BUILDING]), 0, camera_id);
 
@@ -181,6 +178,20 @@ void display_camera(int camera_id) {
 	draw_static_object(&(static_objects[OBJ_GODZILLA]), 0, camera_id);
 	draw_static_object(&(static_objects[OBJ_BUS]), 0, camera_id);
 	draw_static_object(&(static_objects[OBJ_BIKE]), 0, camera_id);
+
+	draw_car(camera_id);
+
+	if (flag_draw_screen) {
+		if (shader_selected == PHONG) {
+			glUniform1i(loc_screen_effect, flag_screen_effect);
+			if(flag_screen_effect)
+				glUniform1f(loc_screen_width, screen_width);
+		}
+		set_material_screen();
+		draw_screen(camera_id);
+		if (shader_selected == PHONG)
+			glUniform1i(loc_screen_effect, 0);
+	}
 
 	set_material_tiger();
 	draw_animated_tiger(camera_id);
@@ -250,10 +261,10 @@ void display_camera(int camera_id) {
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(120.0f, 85.0f, 0.0f));
-	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, car_rotation_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 160.0f, 20.0f));
-	ModelMatrix_CAR_BODY = glm::scale(ModelMatrix_CAR_BODY, glm::vec3(4.0f, 4.0f, 4.0f));
+	ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(35.0f, 35.0f, 0.0f));
+	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, car_rotation_angle * 9.0f * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 12.0f, 20.0f));
+	ModelMatrix_CAR_BODY = glm::scale(ModelMatrix_CAR_BODY, glm::vec3(1.2f, 1.2f, 1.2f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	if (ViewMode == EXTERIOR_MODE) { // MAIN_CAM, SIDE_CAM, FRONT_CAM, TOP_CAM
@@ -299,8 +310,8 @@ void switch_shader_to(int shader) {
 		loc_ModelViewMatrix = &loc_ModelViewMatrix_PS;
 		loc_ModelViewMatrixInvTrans = &loc_ModelViewMatrixInvTrans_PS;
 
-		loc_screen_effect = glGetUniformLocation(*shader_program, "screen_effect");
-		loc_screen_width = glGetUniformLocation(*shader_program, "screen_width");
+		loc_screen_effect = glGetUniformLocation(*shader_program, "u_screen_effect");
+		loc_screen_width = glGetUniformLocation(*shader_program, "u_screen_width");
 
 		loc_blind_effect = glGetUniformLocation(*shader_program, "u_blind_effect");
 		loc_blind_intensity = glGetUniformLocation(*shader_program, "u_blind_intensity");
@@ -664,6 +675,35 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'v': // toggle screen effect
 	case 'V':
 		if (shader_selected == PHONG) {
+			flag_draw_screen = 1 - flag_draw_screen;
+			fprintf(stdout, "^^^ Screen effect %s.\n", flag_draw_screen ? "ENABLED" : "DISABLED");
+			glutPostRedisplay();
+		}
+		break;
+	case '+': // increase screen width
+		if (shader_selected == PHONG && flag_draw_screen) {
+			if (screen_width + 0.05f <= 0.51f) {
+				screen_width += 0.05f;
+				fprintf(stdout, "^^^ Screen width increased to %.2f.\n", screen_width);
+			}
+			if (screen_width < 0.5f)
+				flag_screen_effect = 1;
+			else
+				flag_screen_effect = 0;
+			glutPostRedisplay();
+		}
+		break;
+	case '-': // decrease screen width
+		if (shader_selected == PHONG && flag_draw_screen) {
+			if (screen_width - 0.05f > -0.00f) {
+				screen_width -= 0.05f;
+				fprintf(stdout, "^^^ Screen width decreased to %.2f.\n", screen_width);
+			}
+			if (screen_width < 0.5f)
+				flag_screen_effect = 1;
+			else
+				flag_screen_effect = 0;
+			glutPostRedisplay();
 		}
 		break;
 	case 'g': // toggle shader program
@@ -792,7 +832,7 @@ void timer_scene(int timestamp_scene) {
 	tiger_data.cur_frame = timestamp_scene % N_TIGER_FRAMES;
 	car_rotation_angle = timestamp_scene % 360;
 	glutPostRedisplay();
-	glutTimerFunc(100, timer_scene, (timestamp_scene + (pause_animation ? 0 : 1)) % INT_MAX);
+	glutTimerFunc(100, timer_scene, ((long) timestamp_scene + (pause_animation ? 0 : 1)) % INT_MAX);
 }
 
 void register_callbacks(void) {
@@ -1000,16 +1040,18 @@ void initialize_camera(void) {
 void initialize_OpenGL(void) {
 	glDisable(GL_DEPTH_TEST); //glEnable(GL_DEPTH_TEST); // Default state
 	glEnable(GL_MULTISAMPLE);
-
+	
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	 
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//glClearColor(0.12f, 0.18f, 0.12f, 1.0f);
 
-	flag_draw_screen = flag_screen_effect = flag_blind_effect = flag_cartoon_effect = 0;
-	screen_width = 0.125f;
+	flag_draw_screen = 0;
+	flag_screen_effect = 0;
+	flag_blind_effect = flag_cartoon_effect = 0;
+	screen_width = 0.5f;
 	cartoon_level = 3.0f;
 	blind_intensity = 90.0f;
 
@@ -1019,7 +1061,7 @@ void initialize_OpenGL(void) {
 void set_up_scene_lights(void) {
 	glUseProgram(*shader_program);
 
-	// light 0 : point light in EC
+	// light 0 : point light in EC of MAIN_CAM
 	light[0].light_on = 1 - lightOff[0];
 
 	light[0].position[0] = 0.0f;
@@ -1120,6 +1162,7 @@ void prepare_scene(void) {
 	char car_wheel[] = "Data/car_wheel_triangles_v.txt";
 	char car_nut[] = "Data/car_nut_triangles_v.txt";
 	
+	
 	define_axes();
 	define_static_objects();
 	define_animated_tiger();
@@ -1128,6 +1171,7 @@ void prepare_scene(void) {
 	prepare_hier_obj(HIER_OBJ_CAR_BODY, car_body, HIER_OBJ_TYPE_V);
 	prepare_hier_obj(HIER_OBJ_CAR_WHEEL, car_wheel, HIER_OBJ_TYPE_V);
 	prepare_hier_obj(HIER_OBJ_CAR_NUT, car_nut, HIER_OBJ_TYPE_V);
+	define_screen();
 
 	switch_shader_to(PHONG);
 }
@@ -1181,7 +1225,7 @@ void main(int argc, char *argv[]) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	glutInitWindowSize(1200, 800);
-	glutInitContextVersion(4, 1);
+	glutInitContextVersion(4, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow(program_name);
 

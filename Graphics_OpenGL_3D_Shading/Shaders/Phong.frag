@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 struct LIGHT {
 	vec4 position; // assume point or direction in EC in this example shader
@@ -24,8 +24,8 @@ uniform LIGHT u_light[NUMBER_OF_LIGHTS_SUPPORTED];
 uniform MATERIAL u_material;
 
 // shader extension
-uniform bool screen_effect = false;
-uniform float screen_width = 0.125f;
+uniform bool u_screen_effect = false;
+uniform float u_screen_width = 0.125f;
 
 uniform bool u_blind_effect = false;
 uniform float u_blind_intensity = 90.0f;
@@ -114,15 +114,16 @@ vec4 lighting_equation(in vec3 P_EC, in vec3 N_EC) {
  	return color_sum;
 }
 
-void main(void) {   
-	if(screen_effect) {
+void main(void) {
+	
+	if(u_screen_effect) {
 		float x_mod, y_mod;
-		x_mod = mod(v_position_sc.x*3.0f, 1.0f);
-		y_mod = mod(v_position_sc.y*2.0f, 1.0f);
+		x_mod = mod(v_position_sc.x*5.0f, 1.0f);
+		y_mod = mod(v_position_sc.y*3.0f, 1.0f);
 
-		if( (x_mod > screen_width) && (x_mod < 1.0f - screen_width) && (y_mod > screen_width) && (y_mod < 1.0f - screen_width) )
+		if( (x_mod > u_screen_width) && (x_mod < 1.0f - u_screen_width) && (y_mod > u_screen_width) && (y_mod < 1.0f - u_screen_width) )
 			discard;
 	}
 
-   final_color = lighting_equation(v_position_EC, normalize(v_normal_EC)); // for normal rendering
+	final_color = lighting_equation(v_position_EC, normalize(v_normal_EC)); // for normal rendering
 }
