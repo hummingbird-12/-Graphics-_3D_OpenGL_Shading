@@ -950,7 +950,7 @@ void initialize_lights_and_material(void) { // follow OpenGL conventions for ini
 	glUniform1f(loc_material.specular_exponent, 0.0f); // [0.0, 128.0]
 
 	if (shader_selected == PHONG) {
-		glUniform1i(loc_screen_effect, flag_screen_effect);
+		glUniform1i(loc_screen_effect, 0);
 		glUniform1f(loc_screen_width, screen_width);
 
 		glUniform1i(loc_blind_effect, flag_blind_effect);
