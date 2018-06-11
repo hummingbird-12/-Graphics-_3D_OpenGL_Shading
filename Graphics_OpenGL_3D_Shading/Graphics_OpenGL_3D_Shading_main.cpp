@@ -16,9 +16,9 @@ Light_Parameters light[NUMBER_OF_LIGHT_SUPPORTED];
 GLint loc_global_ambient_color;
 loc_light_Parameters loc_light[NUMBER_OF_LIGHT_SUPPORTED];
 loc_Material_Parameters loc_material;
-GLint loc_blind_effect, loc_cartoon_effect, loc_screen_effect;
+GLint loc_blind_effect, loc_cartoon_effect, loc_screen_effect, loc_negative_effect;
 GLint loc_blind_intensity, loc_cartoon_level, loc_screen_width;
-int flag_draw_screen, flag_blind_effect, flag_cartoon_effect, flag_screen_effect;
+int flag_draw_screen, flag_blind_effect, flag_cartoon_effect, flag_screen_effect, flag_negative_effect;
 float blind_intensity, cartoon_level, screen_width;
 
 bool lightOff[NUMBER_OF_LIGHT_SUPPORTED];
@@ -268,7 +268,7 @@ void display(void) {
 
 	ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(35.0f, 35.0f, 0.0f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, car_rotation_angle * 9.0f * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 12.0f, 20.0f));
+	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 12.0f, 6.0f));
 	ModelMatrix_CAR_BODY = glm::scale(ModelMatrix_CAR_BODY, glm::vec3(1.2f, 1.2f, 1.2f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -323,6 +323,8 @@ void switch_shader_to(int shader) {
 
 		loc_cartoon_effect = glGetUniformLocation(*shader_program, "u_cartoon_effect");
 		loc_cartoon_level = glGetUniformLocation(*shader_program, "u_cartoon_level");
+
+		loc_negative_effect = glGetUniformLocation(*shader_program, "u_negative_effect");
 	}
 	else { // GOURAUD SHADING
 		shader_selected = GOURAUD;
@@ -746,8 +748,17 @@ void keyboard(unsigned char key, int x, int y) {
 		fprintf(stdout, "^^^ Switched to %s Shading.\n", shader_selected ? "GOURAUD" : "PHONG");
 		glutPostRedisplay();
 		break;
-	case '?':
+	case '?': // toggle club light
 		flag_random_light = 1 - flag_random_light;
+		break;
+	case 'z':
+	case 'Z':
+		if (shader_selected == PHONG) {
+			flag_negative_effect = 1 - flag_negative_effect;
+			fprintf(stdout, "^^^ Negative effect %s.\n", flag_draw_screen ? "ENABLED" : "DISABLED");
+			glutPostRedisplay();
+		}
+		break;
 	}
 }
 
@@ -958,6 +969,8 @@ void initialize_lights_and_material(void) { // follow OpenGL conventions for ini
 
 		glUniform1i(loc_cartoon_effect, flag_cartoon_effect);
 		glUniform1f(loc_cartoon_level, cartoon_level);
+
+		glUniform1i(loc_negative_effect, flag_negative_effect);
 	}
 
 	glUseProgram(0);
@@ -1089,7 +1102,7 @@ void initialize_OpenGL(void) {
 
 	flag_draw_screen = 0;
 	flag_screen_effect = 0;
-	flag_blind_effect = flag_cartoon_effect = 0;
+	flag_blind_effect = flag_cartoon_effect = flag_negative_effect = 0;
 	screen_width = 0.5f;
 	cartoon_level = 3.0f;
 	blind_intensity = 90.0f;

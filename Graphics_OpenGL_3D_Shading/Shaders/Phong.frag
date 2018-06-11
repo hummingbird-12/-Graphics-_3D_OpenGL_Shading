@@ -33,6 +33,8 @@ uniform float u_blind_intensity = 90.0f;
 uniform bool u_cartoon_effect = false;
 uniform float u_cartoon_level = 3.0f;
 
+uniform bool u_negative_effect = false;
+
 const float zero_f = 0.0f;
 const float one_f = 1.0f;
 
@@ -126,4 +128,6 @@ void main(void) {
 	}
 
 	final_color = lighting_equation(v_position_EC, normalize(v_normal_EC)); // for normal rendering
+	if(u_negative_effect)
+		final_color = vec4(1.0f) - final_color;
 }
