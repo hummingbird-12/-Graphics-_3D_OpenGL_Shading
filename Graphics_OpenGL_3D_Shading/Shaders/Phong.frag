@@ -79,7 +79,7 @@ vec4 lighting_equation(in vec3 P_EC, in vec3 N_EC) {
 
 				tmp_float = dot(-L_EC, spot_dir);
 				if (tmp_float >= cos(radians(spot_cutoff_angle))) {
-					if(u_blind_effect) {
+					if((i > 0) && u_blind_effect) {
 						tmp_float = pow(tmp_float, u_light[i].spot_exponent) * cos(u_blind_intensity * acos(tmp_float));
 					}
 					else

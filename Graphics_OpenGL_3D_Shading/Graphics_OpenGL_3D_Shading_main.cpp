@@ -767,7 +767,7 @@ void keyboard(unsigned char key, int x, int y) {
 			glutPostRedisplay();
 		}
 		break;
-	case 'x':
+	case 'x': // toggle wave effect
 	case 'X':
 		if (shader_selected == PHONG) {
 			flag_wave_effect = 1 - flag_wave_effect;
@@ -1333,8 +1333,8 @@ void print_message(const char * m) {
 void greetings(char *program_name, char messages[][256], int n_message_lines) {
 	fprintf(stdout, "**************************************************************\n\n");
 	fprintf(stdout, "  PROGRAM NAME: %s\n\n", program_name);
-	fprintf(stdout, "    This program was coded for CSE4170 students\n");
-	fprintf(stdout, "      of Dept. of Comp. Sci. & Eng., Sogang University.\n\n");
+	fprintf(stdout, "    This program was coded for CSE4170 project.\n");
+	fprintf(stdout, "    Dept. of Comp. Sci. & Eng., Sogang University.\n\n");
 
 	for (int i = 0; i < n_message_lines; i++)
 		fprintf(stdout, "%s\n", messages[i]);
@@ -1345,8 +1345,8 @@ void greetings(char *program_name, char messages[][256], int n_message_lines) {
 
 #define N_MESSAGE_LINES 1
 void main(int argc, char *argv[]) { 
-	char program_name[256] = "Sogang CSE4170 Our_House_GLSL_V_0.5";
-	char messages[N_MESSAGE_LINES][256] = { "    - Keys used: 'c', 'f', 'd', 'ESC'" };
+	char program_name[256] = "Graphics_OpenGL_3D_Shading";
+	char messages[N_MESSAGE_LINES][256] = { "    - Keys used: See README in .docx file.\n" };
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
