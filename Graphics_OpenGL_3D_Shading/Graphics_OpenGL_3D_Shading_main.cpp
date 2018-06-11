@@ -16,10 +16,11 @@ Light_Parameters light[NUMBER_OF_LIGHT_SUPPORTED];
 GLint loc_global_ambient_color;
 loc_light_Parameters loc_light[NUMBER_OF_LIGHT_SUPPORTED];
 loc_Material_Parameters loc_material;
-GLint loc_blind_effect, loc_cartoon_effect, loc_screen_effect, loc_negative_effect;
+GLint loc_blind_effect, loc_cartoon_effect, loc_screen_effect, loc_negative_effect, loc_wave_effect;
 GLint loc_blind_intensity, loc_cartoon_level, loc_screen_width;
-int flag_draw_screen, flag_blind_effect, flag_cartoon_effect, flag_screen_effect, flag_negative_effect;
-float blind_intensity, cartoon_level, screen_width;
+GLint loc_wave_position;
+int flag_draw_screen, flag_blind_effect, flag_cartoon_effect, flag_screen_effect, flag_negative_effect, flag_wave_effect;
+float blind_intensity, cartoon_level, screen_width, wave_position;
 
 bool lightOff[NUMBER_OF_LIGHT_SUPPORTED];
 bool flag_random_light;
@@ -154,7 +155,11 @@ void display_camera(int camera_id) {
 		}
 	}
 
+	if (shader_selected == PHONG && flag_wave_effect)
+		glUniform1i(loc_wave_effect, flag_wave_effect);
 	draw_static_object(&(static_objects[OBJ_BUILDING]), 0, camera_id);
+	if (shader_selected == PHONG && flag_wave_effect)
+		glUniform1i(loc_wave_effect, 0);
 
 	draw_static_object(&(static_objects[OBJ_TABLE]), 0, camera_id);
 	draw_static_object(&(static_objects[OBJ_TABLE]), 1, camera_id);
@@ -325,6 +330,9 @@ void switch_shader_to(int shader) {
 		loc_cartoon_level = glGetUniformLocation(*shader_program, "u_cartoon_level");
 
 		loc_negative_effect = glGetUniformLocation(*shader_program, "u_negative_effect");
+
+		loc_wave_effect = glGetUniformLocation(*shader_program, "u_wave_effect");
+		loc_wave_position = glGetUniformLocation(*shader_program, "u_wave_position");
 	}
 	else { // GOURAUD SHADING
 		shader_selected = GOURAUD;
@@ -751,11 +759,19 @@ void keyboard(unsigned char key, int x, int y) {
 	case '?': // toggle club light
 		flag_random_light = 1 - flag_random_light;
 		break;
-	case 'z':
+	case 'z': // toggle negative color effect
 	case 'Z':
 		if (shader_selected == PHONG) {
 			flag_negative_effect = 1 - flag_negative_effect;
-			fprintf(stdout, "^^^ Negative effect %s.\n", flag_draw_screen ? "ENABLED" : "DISABLED");
+			fprintf(stdout, "^^^ Negative color effect %s.\n", flag_negative_effect ? "ENABLED" : "DISABLED");
+			glutPostRedisplay();
+		}
+		break;
+	case 'x':
+	case 'X':
+		if (shader_selected == PHONG) {
+			flag_wave_effect = 1 - flag_wave_effect;
+			fprintf(stdout, "^^^ Wave effect %s.\n", flag_wave_effect ? "ENABLED" : "DISABLED");
 			glutPostRedisplay();
 		}
 		break;
@@ -881,6 +897,8 @@ void timer_scene(int timestamp_scene) {
 	light_seed[2] = (rand() * timestamp_scene) % 255;
 	tiger_data.cur_frame = timestamp_scene % N_TIGER_FRAMES;
 	car_rotation_angle = timestamp_scene % 360;
+	wave_position = timestamp_scene % 240;
+
 	glutPostRedisplay();
 	glutTimerFunc(100, timer_scene, ((long) timestamp_scene + (pause_animation ? 0 : 1)) % INT_MAX);
 }
@@ -971,6 +989,9 @@ void initialize_lights_and_material(void) { // follow OpenGL conventions for ini
 		glUniform1f(loc_cartoon_level, cartoon_level);
 
 		glUniform1i(loc_negative_effect, flag_negative_effect);
+
+		glUniform1i(loc_wave_effect, 0);
+		glUniform1i(loc_wave_position, wave_position);
 	}
 
 	glUseProgram(0);
@@ -1102,11 +1123,12 @@ void initialize_OpenGL(void) {
 
 	flag_draw_screen = 0;
 	flag_screen_effect = 0;
-	flag_blind_effect = flag_cartoon_effect = flag_negative_effect = 0;
+	flag_blind_effect = flag_cartoon_effect = flag_negative_effect = flag_wave_effect = 0;
 	screen_width = 0.5f;
 	cartoon_level = 3.0f;
 	blind_intensity = 90.0f;
 	flag_random_light = false;
+	wave_position = 0;
 
 	initialize_camera();
 }

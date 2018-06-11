@@ -35,6 +35,9 @@ uniform float u_cartoon_level = 3.0f;
 
 uniform bool u_negative_effect = false;
 
+uniform bool u_wave_effect = false;
+uniform int u_wave_position = 0;
+
 const float zero_f = 0.0f;
 const float one_f = 1.0f;
 
@@ -124,6 +127,11 @@ void main(void) {
 		y_mod = mod(v_position_sc.y*3.0f, 1.0f);
 
 		if( (x_mod > u_screen_width) && (x_mod < 1.0f - u_screen_width) && (y_mod > u_screen_width) && (y_mod < 1.0f - u_screen_width) )
+			discard;
+	}
+
+	if(u_wave_effect) {
+		if( (v_position_sc.x >= u_wave_position - 10) && (v_position_sc.x <= u_wave_position + 10) )
 			discard;
 	}
 
