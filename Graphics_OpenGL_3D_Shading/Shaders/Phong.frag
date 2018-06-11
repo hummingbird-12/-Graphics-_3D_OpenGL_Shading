@@ -19,7 +19,7 @@ struct MATERIAL {
 };
 
 uniform vec4 u_global_ambient_color;
-#define NUMBER_OF_LIGHTS_SUPPORTED 6
+#define NUMBER_OF_LIGHTS_SUPPORTED 7
 uniform LIGHT u_light[NUMBER_OF_LIGHTS_SUPPORTED];
 uniform MATERIAL u_material;
 
@@ -130,10 +130,9 @@ void main(void) {
 			discard;
 	}
 
-	if(u_wave_effect) {
+	if(u_wave_effect)
 		if( (v_position_sc.x >= u_wave_position - 10) && (v_position_sc.x <= u_wave_position + 10) )
 			discard;
-	}
 
 	final_color = lighting_equation(v_position_EC, normalize(v_normal_EC)); // for normal rendering
 	if(u_negative_effect)

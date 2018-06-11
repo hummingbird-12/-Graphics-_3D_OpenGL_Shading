@@ -10,7 +10,7 @@
 GLuint h_ShaderProgram_simple, h_ShaderProgram_PS, h_ShaderProgram_GS; // handle to shader program
 GLint loc_ModelViewProjectionMatrix_simple, loc_primitive_color; // indices of uniform variables
 
-#define NUMBER_OF_LIGHT_SUPPORTED 6 // lights in scene
+#define NUMBER_OF_LIGHT_SUPPORTED 7 // lights in scene
 Light_Parameters light[NUMBER_OF_LIGHT_SUPPORTED];
 
 GLint loc_global_ambient_color;
@@ -498,7 +498,7 @@ void keyboard(unsigned char key, int x, int y) {
 	case 27: // ESC key
 		glutLeaveMainLoop(); // Incur destuction callback for cleanups.
 		break;
-	case '7': // face cull toggle
+	case '8': // face cull toggle
 		flag_cull_face = (flag_cull_face + 1) % 3;
 		switch (flag_cull_face) {
 		case 0:
@@ -520,7 +520,7 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		}
 		break;
-	case '8': // draw/fill toggle
+	case '9': // draw/fill toggle
 		polygon_fill_on = 1 - polygon_fill_on;
 		if (polygon_fill_on) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -532,7 +532,7 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		glutPostRedisplay();
 		break;
-	case '9': // depth test toggle
+	case '0': // depth test toggle
 		depth_test_on = 1 - depth_test_on;
 		if (depth_test_on) {
 			glEnable(GL_DEPTH_TEST);
@@ -1136,7 +1136,7 @@ void initialize_OpenGL(void) {
 void set_up_scene_lights(void) {
 	glUseProgram(*shader_program);
 
-	// light 0 : point light in EC of MAIN_CAM
+	// light 0 : spot light in WC (MAIN_CAM's position)
 	light[0].light_on = 1 - lightOff[0];
 
 	light[0].position[0] = camera[MAIN_CAM].pos.x;
@@ -1250,6 +1250,35 @@ void set_up_scene_lights(void) {
 		glUniform1f(loc_light[i].spot_cutoff_angle, light[i].spot_cutoff_angle);
 		glUniform1f(loc_light[i].spot_exponent, light[i].spot_exponent);
 	}
+
+	// light 6 : point light in WC
+	light[6].light_on = 1 - lightOff[6];
+
+	light[6].position[0] = 120.0f;
+	light[6].position[1] = 80.0f;
+	light[6].position[2] = 45.0f;
+	light[6].position[3] = 1.0f;
+
+	light[6].ambient_color[0] = 1.0f;
+	light[6].ambient_color[1] = 1.0f;
+	light[6].ambient_color[2] = 1.0f;
+	light[6].ambient_color[3] = 1.0f;
+
+	light[6].diffuse_color[0] = 1.0f;
+	light[6].diffuse_color[1] = 1.0f;
+	light[6].diffuse_color[2] = 1.0f;
+	light[6].diffuse_color[3] = 1.0f;
+
+	light[6].specular_color[0] = 1.0f;
+	light[6].specular_color[1] = 1.0f;
+	light[6].specular_color[2] = 1.0f;
+	light[6].specular_color[3] = 1.0f;
+
+	glUniform1i(loc_light[6].light_on, light[6].light_on);
+	//glUniform4fv(loc_light[6].position, 1, light[6].position);
+	glUniform4fv(loc_light[6].ambient_color, 1, light[6].ambient_color);
+	glUniform4fv(loc_light[6].diffuse_color, 1, light[6].diffuse_color);
+	glUniform4fv(loc_light[6].specular_color, 1, light[6].specular_color);
 
 	glUseProgram(0);
 }
